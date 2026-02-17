@@ -4,16 +4,10 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from pydantic import BaseModel
 
 from .database import init_db
-
-
-class HealthResponse(BaseModel):
-    """Response model for the health check endpoint."""
-
-    status: str
-    version: str
+from .models import HealthResponse
+from .routes import auth as auth_routes
 
 
 @asynccontextmanager
@@ -26,6 +20,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     app = FastAPI(title="Calculator API", version="0.1.0", lifespan=lifespan)
+
+    app.include_router(auth_routes.router)
 
     @app.get("/health", response_model=HealthResponse)
     def health_check() -> HealthResponse:
