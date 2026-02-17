@@ -6,3 +6,5 @@ calculator.db
 dist/
 build/
 .eggs/
+.pytest_cache/
+venv/
