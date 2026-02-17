@@ -7,6 +7,9 @@ from fastapi import FastAPI
 
 from .database import init_db
 from .models import HealthResponse
+from .routes import auth as auth_routes
+from .routes import calculator as calculator_routes
+from .routes import calculations as calculations_routes
 
 
 @asynccontextmanager
@@ -20,13 +23,9 @@ def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     application = FastAPI(title="Calculator API", version="0.1.0", lifespan=lifespan)
 
-    # Route modules will be wired in Task 2:
-    # from .routes import auth as auth_routes
-    # from .routes import calculator as calculator_routes
-    # from .routes import calculations as calculations_routes
-    # application.include_router(auth_routes.router)
-    # application.include_router(calculator_routes.router)
-    # application.include_router(calculations_routes.router)
+    application.include_router(auth_routes.router)
+    application.include_router(calculator_routes.router)
+    application.include_router(calculations_routes.router)
 
     @application.get("/health", response_model=HealthResponse)
     def health_check() -> HealthResponse:

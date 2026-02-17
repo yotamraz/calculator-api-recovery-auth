@@ -20,7 +20,7 @@ dev = [
 calculator-api = "app.main:run"
 
 [tool.setuptools]
-packages = ["app"]
+packages = ["app", "app.routes"]
 
 [tool.ruff]
 line-length = 100
