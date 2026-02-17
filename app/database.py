@@ -14,8 +14,7 @@ engine = create_engine(
 
 
 def init_db() -> None:
-    """Drop and recreate all database tables for a clean state."""
-    SQLModel.metadata.drop_all(engine)
+    """Create all database tables (file is deleted by cleanup.py before startup)."""
     SQLModel.metadata.create_all(engine)
 
 
