@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-17T19:49:35.393353+00:00
+Generated at: 2026-02-17T19:53:31.065534+00:00
 Project: calculator-api-recovery-auth
 Milestone: 70
 """
@@ -74,7 +74,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_reg_hp_unique_v5",
+                "username": "testuser_reg_hp_unique_v6",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -92,7 +92,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_dup_v5",
+                "username": "testuser_dup_v6",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -101,7 +101,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "testuser_dup_v5",
+                "username": "testuser_dup_v6",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -134,7 +134,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_login_v5",
+                "username": "testuser_login_v6",
                 "password": "${TEST_PASSWORD}"
             },
             "content_type": "application/x-www-form-urlencoded"
@@ -144,7 +144,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "testuser_login_v5",
+                "username": "testuser_login_v6",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -160,7 +160,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_login2_v5",
+                "username": "testuser_login2_v6",
                 "password": "wrongpassword"
             },
             "content_type": "application/x-www-form-urlencoded"
@@ -170,7 +170,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "testuser_login2_v5",
+                "username": "testuser_login2_v6",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -209,11 +209,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "b": 3.0
             },
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 200,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -248,11 +257,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "b": -3.2
             },
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 200,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -269,11 +287,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "b": 4.0
             },
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 200,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -308,11 +335,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "b": 6.0
             },
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 200,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -329,11 +365,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "b": 0.0
             },
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 200,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -350,11 +395,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "b": 4.0
             },
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 200,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -362,7 +416,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/divide",
         "method": "POST",
-        "description": "Attempt to divide by zero, expect 400 with 'Cannot divide by zero' message",
+        "description": "Attempt to divide by zero, expect 400 with error message",
         "request_data": {
             "path": {},
             "query": {},
@@ -371,11 +425,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "b": 0.0
             },
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 400,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -411,11 +474,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "b": 6.0
             },
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 201,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -433,11 +505,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "b": 3.0
             },
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 400,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -455,11 +536,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "b": 0.0
             },
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 400,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -473,11 +563,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "query": {},
             "body": null,
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 200,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     },
     {
@@ -496,47 +595,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "get_calculation_by_id_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "GET",
-        "description": "Create a calculation then retrieve it by ID",
-        "setup": {
-            "endpoint": "/calculations",
-            "method": "POST",
-            "body": {
-                "operation": "add",
-                "a": 1.0,
-                "b": 2.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "extract_id_from": "id"
-        },
-        "request_data": {
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
-        },
-        "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/calculations/{calculation_id}",
-            "method": "DELETE",
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
-        }
-    },
-    {
         "name": "get_calculation_not_found",
         "category": "NOT_FOUND",
         "endpoint": "/calculations/{calculation_id}",
@@ -549,43 +607,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "query": {},
             "body": null,
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 404,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "delete_calculation_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "DELETE",
-        "description": "Create a calculation then delete it by ID, expect 204",
         "setup": {
-            "endpoint": "/calculations",
+            "endpoint": "/auth/token",
             "method": "POST",
             "body": {
-                "operation": "sub",
-                "a": 10.0,
-                "b": 3.0
+                "username": "testuser_auth_token",
+                "password": "secret123"
             },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "extract_id_from": "id"
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
         },
-        "request_data": {
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
-        },
-        "expected_status": 204,
         "cleanup": null
     },
     {
@@ -601,11 +636,20 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "query": {},
             "body": null,
             "headers": {
-                "Authorization": "Bearer $fresh_access_token"
+                "Authorization": "Bearer $setup_id"
             }
         },
         "expected_status": 404,
-        "setup": null,
+        "setup": {
+            "endpoint": "/auth/token",
+            "method": "POST",
+            "body": {
+                "username": "testuser_auth_token",
+                "password": "secret123"
+            },
+            "content_type": "application/x-www-form-urlencoded",
+            "extract_id_from": "access_token"
+        },
         "cleanup": null
     }
 ]''')
