@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-17T13:17:29.825482+00:00
+Generated at: 2026-02-17T13:21:29.742060+00:00
 Project: calculator-api-recovery-auth
 Milestone: 67
 """
@@ -73,7 +73,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_reg_hp_v7",
+                "username": "testuser_reg_hp_v8",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -91,7 +91,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_dup_v7",
+                "username": "testuser_dup_v8",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -100,7 +100,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "testuser_dup_v7",
+                "username": "testuser_dup_v8",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -116,7 +116,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_no_pw_v7"
+                "username": "testuser_no_pw_v8"
             }
         },
         "expected_status": 422,
@@ -133,7 +133,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_login_hp_v7",
+                "username": "testuser_login_hp_v8",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -142,7 +142,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "testuser_login_hp_v7",
+                "username": "testuser_login_hp_v8",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -158,7 +158,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_login_bad_v7",
+                "username": "testuser_login_bad_v8",
                 "password": "wrong_password_xyz"
             }
         },
@@ -167,7 +167,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "testuser_login_bad_v7",
+                "username": "testuser_login_bad_v8",
                 "password": "${TEST_PASSWORD}"
             }
         },
@@ -183,7 +183,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "nonexistent_user_xyz_v7",
+                "username": "nonexistent_user_xyz_v8",
                 "password": "anypassword"
             }
         },
