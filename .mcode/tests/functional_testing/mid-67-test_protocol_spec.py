@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-17T13:26:14.068772+00:00
+Generated at: 2026-02-17T13:33:16.579416+00:00
 Project: calculator-api-recovery-auth
 Milestone: 67
 """
@@ -890,6 +890,92 @@ def store_response_values(test_case: dict[str, Any], response_json: Any) -> None
             print(f"  Warning: store path '{json_path}' resolved to None for '{placeholder_name}'")
 
 
+def update_auth_from_response(
+    test_case: dict[str, Any],
+    response_json: Any,
+    response: "requests.Response | None" = None,
+) -> None:
+    """Update the global auth cache from a test response.
+
+    Called after a successful test that has ``store_auth`` configuration.
+    This lets login/register tests propagate authentication to all subsequent tests.
+
+    ``store_auth`` format::
+
+        {
+            "headers": {
+                "Authorization": "Bearer {access_token}"   # {key} resolved from response store
+            },
+            "cookies": {
+                "session_id": "session_id"                 # JSON path into response body
+            },
+            "from_cookies": true                            # also persist Set-Cookie headers
+        }
+
+    If the test case has no ``store_auth`` but its category is "SETUP" or "AUTH",
+    we auto-detect common auth tokens in the response and update the cache.
+    """
+    global _auth_cache
+    store_auth = test_case.get("store_auth")
+    category = (test_case.get("category") or "").upper()
+
+    if not store_auth and category not in ("SETUP", "AUTH"):
+        return
+
+    if _auth_cache is None:
+        _auth_cache = {"headers": {}, "cookies": {}}
+
+    # --- Explicit store_auth configuration ---
+    if store_auth and isinstance(store_auth, dict):
+        # Update headers (supports {placeholder} interpolation from _response_store)
+        for header_name, template in store_auth.get("headers", {}).items():
+            resolved = str(template)
+            # Resolve {key} placeholders from response store
+            for key, value in _response_store.items():
+                resolved = resolved.replace(f"{{{key}}}", str(value))
+            _auth_cache.setdefault("headers", {})[header_name] = resolved
+
+        # Update cookies from response body paths
+        for cookie_name, json_path in store_auth.get("cookies", {}).items():
+            if isinstance(response_json, (dict, list)):
+                value = extract_by_json_path(response_json, json_path)
+                if value is not None:
+                    _auth_cache.setdefault("cookies", {})[cookie_name] = str(value)
+
+        # Persist Set-Cookie headers from the HTTP response
+        if store_auth.get("from_cookies") and response is not None:
+            for cookie_name, cookie_value in response.cookies.items():
+                _auth_cache.setdefault("cookies", {})[cookie_name] = cookie_value
+
+        print(
+            f"  Auth updated (explicit): headers={list(_auth_cache.get('headers', {}).keys())}, "
+            f"cookies={list(_auth_cache.get('cookies', {}).keys())}"
+        )
+        return
+
+    # --- Auto-detect auth from SETUP/AUTH category tests ---
+    if isinstance(response_json, dict):
+        # Common token field names
+        token_fields = {
+            "access_token", "token", "accessToken", "jwt",
+            "id_token", "idToken", "auth_token", "authToken",
+        }
+        for field in token_fields:
+            value = response_json.get(field)
+            if value and isinstance(value, str):
+                # Determine prefix (Bearer for most tokens)
+                prefix = "Bearer " if field != "jwt" else ""
+                _auth_cache.setdefault("headers", {})["Authorization"] = f"{prefix}{value}"
+                print(f"  Auth auto-detected: Authorization header set from '{field}'")
+                break
+
+        # Also persist cookies from the response
+        if response is not None:
+            for cookie_name, cookie_value in response.cookies.items():
+                _auth_cache.setdefault("cookies", {})[cookie_name] = cookie_value
+                print(f"  Auth auto-detected: cookie '{cookie_name}' persisted")
+
+
 def resolve_stored_placeholders(obj: Any) -> Any:
     """Replace $stored.KEY placeholders with values from the response store.
 
@@ -992,27 +1078,85 @@ def make_request(
         return requests.request(method, url, headers=headers, cookies=cookies, json=body, timeout=REQUEST_TIMEOUT)
 
 
+def _extract_id_from_json(data: Any, extract_path: str) -> str | None:
+    """Extract an ID from JSON data using a dot-separated path.
+
+    Handles nested paths like "data.id" and returns the value as a string.
+    Returns None if the path cannot be resolved.
+    """
+    try:
+        current = data
+        for key in extract_path.split("."):
+            if isinstance(current, dict):
+                current = current[key]
+            elif isinstance(current, list):
+                current = current[int(key)]
+            else:
+                return None
+        return str(current)
+    except (KeyError, TypeError, IndexError, ValueError):
+        return None
+
+
 def run_setup(setup_config: dict[str, Any]) -> str | None:
-    """Run a setup request and return the extracted ID."""
+    """Run a setup request and return the extracted ID.
+
+    Handles 'already exists' responses (409/422) gracefully by:
+    1. Trying to extract the ID from the error response body
+    2. Falling back to a GET request to find the existing resource
+    """
     endpoint = setup_config.get("endpoint", "/")
     method = setup_config.get("method", "POST")
-    body = setup_config.get("body")
+    body = resolve_stored_placeholders(setup_config.get("body"))
     extract_id_from = setup_config.get("extract_id_from", "id")
 
     resp = make_request(method, endpoint, {}, {}, body)
-    if resp.status_code >= 400:
-        print(f"Setup failed: {resp.status_code} - {resp.text}")
+
+    # Happy path — resource created successfully
+    if resp.status_code < 400:
+        extracted = _extract_id_from_json(resp.json() if resp.text else {}, extract_id_from)
+        if extracted is not None:
+            return extracted
+        print(f"Setup: Created resource but could not extract ID via path '{extract_id_from}'")
         return None
 
-    try:
-        data = resp.json()
-        # Handle nested paths like "data.id"
-        for key in extract_id_from.split("."):
-            data = data[key]
-        return str(data)
-    except (json.JSONDecodeError, KeyError, TypeError) as e:
-        print(f"Failed to extract ID from setup response: {e}")
+    # Handle "already exists" (409 Conflict, 422 Unprocessable Entity)
+    if resp.status_code in (409, 422):
+        print(f"Setup: Resource may already exist ({resp.status_code}). Attempting recovery...")
+
+        # Strategy 1: Try to extract ID from the error response body
+        # Many APIs include the existing resource info in the conflict response
+        try:
+            error_data = resp.json()
+            extracted = _extract_id_from_json(error_data, extract_id_from)
+            if extracted is not None:
+                print(f"  Recovered existing resource ID from error response: {extracted}")
+                return extracted
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+        # Strategy 2: Try a GET request on the same endpoint to find existing resource
+        print(f"  Trying GET {endpoint} to find existing resource...")
+        try:
+            get_resp = make_request("GET", endpoint, {}, {}, None)
+            if get_resp.status_code < 400 and get_resp.text:
+                get_data = get_resp.json()
+                # Handle list responses — take the last created item
+                if isinstance(get_data, list) and get_data:
+                    get_data = get_data[-1]
+                extracted = _extract_id_from_json(get_data, extract_id_from)
+                if extracted is not None:
+                    print(f"  Recovered existing resource ID via GET: {extracted}")
+                    return extracted
+        except (json.JSONDecodeError, TypeError, requests.RequestException) as e:
+            print(f"  GET fallback failed: {e}")
+
+        print(f"Setup: Could not recover from 'already exists'. Response: {resp.text[:500]}")
         return None
+
+    # Other error codes — not recoverable
+    print(f"Setup failed: {resp.status_code} - {resp.text[:500]}")
+    return None
 
 
 def run_cleanup(cleanup_config: dict[str, Any], setup_id: str | None) -> None:
@@ -1254,6 +1398,8 @@ def test_api_endpoint(test_case: dict[str, Any]) -> None:
                 try:
                     resp_json = json.loads(response_body)
                     store_response_values(test_case, resp_json)
+                    # Propagate auth from login/register/setup tests to subsequent tests
+                    update_auth_from_response(test_case, resp_json, resp)
                 except (json.JSONDecodeError, TypeError):
                     pass  # Non-JSON responses can't be stored
 
