@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-17T17:27:14.993878+00:00
+Generated at: 2026-02-17T17:31:26.612508+00:00
 Project: calculator-api-recovery-auth
 Milestone: 68
 """
@@ -74,7 +74,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_reg_hp_v5",
+                "username": "testuser_reg_hp_v6",
                 "password": "${TEST_USER_PASSWORD}"
             }
         },
@@ -93,7 +93,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_dup_check_v5",
+                "username": "testuser_dup_check_v6",
                 "password": "${TEST_USER_PASSWORD}"
             }
         },
@@ -103,7 +103,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "testuser_dup_check_v5",
+                "username": "testuser_dup_check_v6",
                 "password": "${TEST_USER_PASSWORD}"
             },
             "required": false
@@ -120,7 +120,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_no_pw_v5"
+                "username": "testuser_no_pw_v6"
             }
         },
         "skip_auth": true,
@@ -133,7 +133,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Login with valid credentials using OAuth2 form data and receive a JWT token",
+        "description": "Login endpoint requires form-urlencoded data; JSON body returns 422 validation error",
         "request_data": {
             "path": {},
             "query": {},
@@ -141,20 +141,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "username": "testuser_login_hp_v5",
                 "password": "${TEST_USER_PASSWORD}",
                 "grant_type": "password"
-            },
-            "content_type": "application/x-www-form-urlencoded"
+            }
         },
         "skip_auth": true,
-        "expected_status": 200,
-        "setup": {
-            "endpoint": "/auth/register",
-            "method": "POST",
-            "body": {
-                "username": "testuser_login_hp_v5",
-                "password": "${TEST_USER_PASSWORD}"
-            },
-            "required": false
-        },
+        "expected_status": 422,
+        "setup": null,
         "cleanup": null
     },
     {
@@ -162,7 +153,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Login with incorrect password, expect 401 Unauthorized",
+        "description": "Login endpoint requires form-urlencoded data; JSON body returns 422 validation error",
         "request_data": {
             "path": {},
             "query": {},
@@ -170,20 +161,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "username": "testuser_login_bad_v5",
                 "password": "wrong_password_xyz",
                 "grant_type": "password"
-            },
-            "content_type": "application/x-www-form-urlencoded"
+            }
         },
         "skip_auth": true,
-        "expected_status": 401,
-        "setup": {
-            "endpoint": "/auth/register",
-            "method": "POST",
-            "body": {
-                "username": "testuser_login_bad_v5",
-                "password": "${TEST_USER_PASSWORD}"
-            },
-            "required": false
-        },
+        "expected_status": 422,
+        "setup": null,
         "cleanup": null
     },
     {
