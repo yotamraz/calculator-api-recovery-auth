@@ -1,0 +1,8 @@
+__pycache__/
+*.egg-info/
+calculator.db
+*.pyc
+.env
+dist/
+build/
+.eggs/
