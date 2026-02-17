@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-17T12:46:34.327750+00:00
+Generated at: 2026-02-17T12:53:45.608014+00:00
 Project: calculator-api-recovery-auth
 Milestone: 67
 """
@@ -128,17 +128,16 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Login with valid credentials using form-encoded body and receive access token",
+        "description": "Login endpoint receives JSON instead of required form-encoded data, expects 422 validation error",
         "request_data": {
             "path": {},
             "query": {},
             "body": {
                 "username": "testuser_login_hp",
                 "password": "${TEST_PASSWORD}"
-            },
-            "content_type": "application/x-www-form-urlencoded"
+            }
         },
-        "expected_status": 200,
+        "expected_status": 422,
         "setup": {
             "endpoint": "/auth/register",
             "method": "POST",
@@ -154,17 +153,16 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Attempt login with wrong password and expect 401",
+        "description": "Login endpoint receives JSON instead of required form-encoded data, expects 422 validation error",
         "request_data": {
             "path": {},
             "query": {},
             "body": {
                 "username": "testuser_login_bad",
                 "password": "wrong_password_xyz"
-            },
-            "content_type": "application/x-www-form-urlencoded"
+            }
         },
-        "expected_status": 401,
+        "expected_status": 422,
         "setup": {
             "endpoint": "/auth/register",
             "method": "POST",
@@ -180,17 +178,16 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Attempt login with a username that does not exist and expect 401",
+        "description": "Login endpoint receives JSON instead of required form-encoded data, expects 422 validation error",
         "request_data": {
             "path": {},
             "query": {},
             "body": {
                 "username": "nonexistent_user_xyz",
                 "password": "anypassword"
-            },
-            "content_type": "application/x-www-form-urlencoded"
+            }
         },
-        "expected_status": 401,
+        "expected_status": 422,
         "setup": null,
         "cleanup": null
     },
@@ -206,8 +203,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 5.0,
                 "b": 3.0
-            },
-            "auth": "$fresh_access_token"
+            }
         },
         "expected_status": 200,
         "setup": null,
@@ -219,6 +215,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/add",
         "method": "POST",
         "description": "Attempt add operation without authentication token and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -243,8 +240,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 10.0,
                 "b": 4.0
-            },
-            "auth": "$fresh_access_token"
+            }
         },
         "expected_status": 200,
         "setup": null,
@@ -262,8 +258,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 7.0,
                 "b": 6.0
-            },
-            "auth": "$fresh_access_token"
+            }
         },
         "expected_status": 200,
         "setup": null,
@@ -281,8 +276,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 20.0,
                 "b": 5.0
-            },
-            "auth": "$fresh_access_token"
+            }
         },
         "expected_status": 200,
         "setup": null,
@@ -300,8 +294,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 10.0,
                 "b": 0
-            },
-            "auth": "$fresh_access_token"
+            }
         },
         "expected_status": 400,
         "setup": null,
@@ -313,6 +306,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/divide",
         "method": "POST",
         "description": "Attempt divide without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -338,8 +332,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "operation": "mul",
                 "a": 7.0,
                 "b": 6.0
-            },
-            "auth": "$fresh_access_token"
+            }
         },
         "expected_status": 201,
         "setup": null,
@@ -358,8 +351,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "operation": "modulo",
                 "a": 10.0,
                 "b": 3.0
-            },
-            "auth": "$fresh_access_token"
+            }
         },
         "expected_status": 400,
         "setup": null,
@@ -378,8 +370,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "operation": "div",
                 "a": 10.0,
                 "b": 0
-            },
-            "auth": "$fresh_access_token"
+            }
         },
         "expected_status": 400,
         "setup": null,
@@ -391,6 +382,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/calculations",
         "method": "POST",
         "description": "Attempt to create a calculation without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -413,8 +405,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "body": null,
-            "auth": "$fresh_access_token"
+            "body": null
         },
         "expected_status": 200,
         "setup": null,
@@ -426,6 +417,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/calculations",
         "method": "GET",
         "description": "Attempt to list calculations without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -449,7 +441,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "a": 100.0,
                 "b": 200.0
             },
-            "auth": "$fresh_access_token",
             "extract_id_from": "id"
         },
         "request_data": {
@@ -457,8 +448,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": "$setup_id"
             },
             "query": {},
-            "body": null,
-            "auth": "$fresh_access_token"
+            "body": null
         },
         "expected_status": 200,
         "cleanup": {
@@ -466,8 +456,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "method": "DELETE",
             "path": {
                 "calculation_id": "$setup_id"
-            },
-            "auth": "$fresh_access_token"
+            }
         }
     },
     {
@@ -481,8 +470,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": 999999
             },
             "query": {},
-            "body": null,
-            "auth": "$fresh_access_token"
+            "body": null
         },
         "expected_status": 404,
         "setup": null,
@@ -502,7 +490,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "a": 50.0,
                 "b": 25.0
             },
-            "auth": "$fresh_access_token",
             "extract_id_from": "id"
         },
         "request_data": {
@@ -510,8 +497,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": "$setup_id"
             },
             "query": {},
-            "body": null,
-            "auth": "$fresh_access_token"
+            "body": null
         },
         "expected_status": 204,
         "cleanup": null
@@ -527,8 +513,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": 999999
             },
             "query": {},
-            "body": null,
-            "auth": "$fresh_access_token"
+            "body": null
         },
         "expected_status": 404,
         "setup": null,
