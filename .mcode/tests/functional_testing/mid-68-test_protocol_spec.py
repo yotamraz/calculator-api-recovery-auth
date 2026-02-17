@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-17T18:00:17.593608+00:00
+Generated at: 2026-02-17T18:05:54.490276+00:00
 Project: calculator-api-recovery-auth
 Milestone: 68
 """
@@ -74,7 +74,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_auth_v10",
+                "username": "testuser_auth_v11",
                 "password": "${TEST_USER_PASSWORD}"
             }
         },
@@ -98,7 +98,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_auth_v10",
+                "username": "testuser_auth_v11",
                 "password": "${TEST_USER_PASSWORD}"
             }
         },
@@ -117,7 +117,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_no_pw_v10"
+                "username": "testuser_no_pw_v11"
             }
         },
         "skip_auth": true,
@@ -135,7 +135,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_login_hp_v10",
+                "username": "testuser_login_hp_v11",
                 "password": "${TEST_USER_PASSWORD}",
                 "grant_type": "password"
             }
@@ -155,7 +155,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_login_bad_v10",
+                "username": "testuser_login_bad_v11",
                 "password": "wrong_password_xyz",
                 "grant_type": "password"
             }
@@ -175,7 +175,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "nonexistent_user_xyz_v10",
+                "username": "nonexistent_user_xyz_v11",
                 "password": "anypassword",
                 "grant_type": "password"
             }
