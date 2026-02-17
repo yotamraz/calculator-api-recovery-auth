@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-17T17:42:25.748939+00:00
+Generated at: 2026-02-17T17:50:20.726731+00:00
 Project: calculator-api-recovery-auth
 Milestone: 68
 """
@@ -66,20 +66,25 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     },
     {
         "name": "register_user_happy_path",
-        "category": "HAPPY_PATH",
+        "category": "AUTH",
         "endpoint": "/auth/register",
         "method": "POST",
-        "description": "Register a new user with valid username and password",
+        "description": "Register a new user - also sets auth token for all subsequent tests via store_auth",
         "request_data": {
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_reg_hp_v7",
+                "username": "testuser_auth_v8",
                 "password": "${TEST_USER_PASSWORD}"
             }
         },
         "skip_auth": true,
         "expected_status": 201,
+        "store_auth": {
+            "headers": {
+                "Authorization": "Bearer ${AUTH_JWT_TOKEN}"
+            }
+        },
         "setup": null,
         "cleanup": null
     },
@@ -93,21 +98,13 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_dup_check_v7",
+                "username": "testuser_auth_v8",
                 "password": "${TEST_USER_PASSWORD}"
             }
         },
         "skip_auth": true,
         "expected_status": 400,
-        "setup": {
-            "endpoint": "/auth/register",
-            "method": "POST",
-            "body": {
-                "username": "testuser_dup_check_v7",
-                "password": "${TEST_USER_PASSWORD}"
-            },
-            "required": false
-        },
+        "setup": null,
         "cleanup": null
     },
     {
@@ -120,7 +117,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_no_pw_v7"
+                "username": "testuser_no_pw_v8"
             }
         },
         "skip_auth": true,
@@ -138,7 +135,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_login_hp_v7",
+                "username": "testuser_login_hp_v8",
                 "password": "${TEST_USER_PASSWORD}",
                 "grant_type": "password"
             }
@@ -158,7 +155,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_login_bad_v7",
+                "username": "testuser_login_bad_v8",
                 "password": "wrong_password_xyz",
                 "grant_type": "password"
             }
@@ -178,7 +175,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "nonexistent_user_xyz_v7",
+                "username": "nonexistent_user_xyz_v8",
                 "password": "anypassword",
                 "grant_type": "password"
             }
@@ -203,15 +200,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             }
         },
         "expected_status": 200,
-        "setup": {
-            "endpoint": "/auth/register",
-            "method": "POST",
-            "body": {
-                "username": "functional_test_user_v7",
-                "password": "SecureTestPass123!"
-            },
-            "required": false
-        },
+        "setup": null,
         "cleanup": null
     },
     {
