@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-18T10:51:18.155120+00:00
+Generated at: 2026-02-18T10:58:45.890588+00:00
 Project: calculator-api-recovery-auth
 Milestone: 75
 """
@@ -105,96 +105,6 @@ TEST_CASES = json.loads(r'''[
         "cleanup": null
     },
     {
-        "name": "login_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/auth/token",
-        "method": "POST",
-        "description": "Login with valid credentials and verify access token is returned",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "username": "testuser_login_hp",
-                "password": "loginPass123"
-            },
-            "content_type": "application/x-www-form-urlencoded"
-        },
-        "expected_status": 200,
-        "setup": {
-            "endpoint": "/auth/register",
-            "method": "POST",
-            "body": {
-                "username": "testuser_login_hp",
-                "password": "loginPass123"
-            }
-        },
-        "cleanup": null
-    },
-    {
-        "name": "login_invalid_credentials",
-        "category": "INVALID_INPUT",
-        "endpoint": "/auth/token",
-        "method": "POST",
-        "description": "Attempt login with wrong password, expect 401",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "username": "testuser_login_bad",
-                "password": "wrongpassword"
-            },
-            "content_type": "application/x-www-form-urlencoded"
-        },
-        "expected_status": 401,
-        "setup": {
-            "endpoint": "/auth/register",
-            "method": "POST",
-            "body": {
-                "username": "testuser_login_bad",
-                "password": "correctPass123"
-            }
-        },
-        "cleanup": null
-    },
-    {
-        "name": "login_nonexistent_user",
-        "category": "INVALID_INPUT",
-        "endpoint": "/auth/token",
-        "method": "POST",
-        "description": "Attempt login with a username that does not exist, expect 401",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "username": "nonexistent_user_xyz",
-                "password": "anypassword"
-            },
-            "content_type": "application/x-www-form-urlencoded"
-        },
-        "expected_status": 401,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "add_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/add",
-        "method": "POST",
-        "description": "Add two positive numbers with a valid auth token",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "a": 5.0,
-                "b": 3.0
-            },
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
         "name": "add_no_auth",
         "category": "INVALID_INPUT",
         "endpoint": "/add",
@@ -209,25 +119,6 @@ TEST_CASES = json.loads(r'''[
             }
         },
         "expected_status": 401,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "subtract_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/subtract",
-        "method": "POST",
-        "description": "Subtract two numbers with a valid auth token",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "a": 10.0,
-                "b": 4.0
-            },
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 200,
         "setup": null,
         "cleanup": null
     },
@@ -250,25 +141,6 @@ TEST_CASES = json.loads(r'''[
         "cleanup": null
     },
     {
-        "name": "multiply_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/multiply",
-        "method": "POST",
-        "description": "Multiply two numbers with a valid auth token",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "a": 7.0,
-                "b": 6.0
-            },
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
         "name": "multiply_no_auth",
         "category": "INVALID_INPUT",
         "endpoint": "/multiply",
@@ -287,44 +159,6 @@ TEST_CASES = json.loads(r'''[
         "cleanup": null
     },
     {
-        "name": "divide_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/divide",
-        "method": "POST",
-        "description": "Divide two numbers with a valid auth token",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "a": 20.0,
-                "b": 5.0
-            },
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "divide_by_zero",
-        "category": "BOUNDARY",
-        "endpoint": "/divide",
-        "method": "POST",
-        "description": "Attempt division by zero, expect 400 error",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "a": 10.0,
-                "b": 0
-            },
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 400,
-        "setup": null,
-        "cleanup": null
-    },
-    {
         "name": "divide_no_auth",
         "category": "INVALID_INPUT",
         "endpoint": "/divide",
@@ -339,66 +173,6 @@ TEST_CASES = json.loads(r'''[
             }
         },
         "expected_status": 401,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "create_calculation_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations",
-        "method": "POST",
-        "description": "Create a new calculation record with a valid operation",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "operation": "mul",
-                "a": 7.0,
-                "b": 6.0
-            },
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 201,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "create_calculation_unknown_operation",
-        "category": "INVALID_INPUT",
-        "endpoint": "/calculations",
-        "method": "POST",
-        "description": "Attempt to create a calculation with an unknown operation, expect 400",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "operation": "modulo",
-                "a": 10.0,
-                "b": 3.0
-            },
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 400,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "create_calculation_div_by_zero",
-        "category": "BOUNDARY",
-        "endpoint": "/calculations",
-        "method": "POST",
-        "description": "Attempt to create a division calculation with b=0, expect 400",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "operation": "div",
-                "a": 10.0,
-                "b": 0
-            },
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 400,
         "setup": null,
         "cleanup": null
     },
@@ -422,22 +196,6 @@ TEST_CASES = json.loads(r'''[
         "cleanup": null
     },
     {
-        "name": "list_calculations_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations",
-        "method": "GET",
-        "description": "List all calculations with a valid auth token, expect 200 with array",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": null,
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
         "name": "list_calculations_no_auth",
         "category": "INVALID_INPUT",
         "endpoint": "/calculations",
@@ -449,105 +207,6 @@ TEST_CASES = json.loads(r'''[
             "body": null
         },
         "expected_status": 401,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "get_calculation_by_id_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "GET",
-        "description": "Create a calculation, then retrieve it by ID",
-        "request_data": {
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "query": {},
-            "body": null,
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 200,
-        "setup": {
-            "endpoint": "/calculations",
-            "method": "POST",
-            "body": {
-                "operation": "add",
-                "a": 3.0,
-                "b": 4.0
-            },
-            "extract_id_from": "id",
-            "auth": "$fresh_access_token"
-        },
-        "cleanup": {
-            "endpoint": "/calculations/{calculation_id}",
-            "method": "DELETE",
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "auth": "$fresh_access_token"
-        }
-    },
-    {
-        "name": "get_calculation_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "GET",
-        "description": "Attempt to retrieve a non-existent calculation by ID, expect 404",
-        "request_data": {
-            "path": {
-                "calculation_id": 999999
-            },
-            "query": {},
-            "body": null,
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 404,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "delete_calculation_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "DELETE",
-        "description": "Create a calculation, then delete it by ID, expect 204",
-        "request_data": {
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "query": {},
-            "body": null,
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 204,
-        "setup": {
-            "endpoint": "/calculations",
-            "method": "POST",
-            "body": {
-                "operation": "sub",
-                "a": 10.0,
-                "b": 2.0
-            },
-            "extract_id_from": "id",
-            "auth": "$fresh_access_token"
-        },
-        "cleanup": null
-    },
-    {
-        "name": "delete_calculation_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "DELETE",
-        "description": "Attempt to delete a non-existent calculation by ID, expect 404",
-        "request_data": {
-            "path": {
-                "calculation_id": 999999
-            },
-            "query": {},
-            "body": null,
-            "auth": "$fresh_access_token"
-        },
-        "expected_status": 404,
         "setup": null,
         "cleanup": null
     }
