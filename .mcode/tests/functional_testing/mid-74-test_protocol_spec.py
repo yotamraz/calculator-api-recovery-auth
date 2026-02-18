@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-18T08:22:34.767732+00:00
+Generated at: 2026-02-18T08:29:49.384368+00:00
 Project: calculator-api-recovery-auth
 Milestone: 74
 """
@@ -124,10 +124,10 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     },
     {
         "name": "login_happy_path",
-        "category": "HAPPY_PATH",
+        "category": "AUTH",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Login with valid credentials and receive a JWT access token. Uses form-encoded body.",
+        "description": "Login with valid credentials and receive a JWT access token. Uses form-encoded body. This test populates the auth session for subsequent tests.",
         "request_data": {
             "path": {},
             "query": {},
@@ -218,6 +218,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/add",
         "method": "POST",
         "description": "Attempt to add numbers without providing an auth token",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -388,6 +389,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/calculations",
         "method": "GET",
         "description": "Attempt to list calculations without authentication",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -420,7 +422,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "a": 7,
                 "b": 6
             },
-            "auth": "$fresh_access_token",
             "extract_id_from": "id"
         },
         "cleanup": {
@@ -428,8 +429,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "method": "DELETE",
             "path": {
                 "calculation_id": "$setup_id"
-            },
-            "auth": "$fresh_access_token"
+            }
         }
     },
     {
@@ -473,7 +473,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "a": 50,
                 "b": 20
             },
-            "auth": "$fresh_access_token",
             "extract_id_from": "id"
         },
         "cleanup": null
