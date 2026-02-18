@@ -1,6 +1,7 @@
-"""Unit tests for core calculator functions in app.core."""
+"""Unit tests for core calculator functions and HTTP-level calculator endpoint tests."""
 
 import pytest
+from fastapi.testclient import TestClient
 
 from app.core import add, divide, multiply, subtract
 
@@ -75,3 +76,68 @@ class TestDivide:
 
     def test_divide_zero_by_nonzero(self):
         assert divide(0, 5) == 0.0
+
+
+# --- HTTP-level calculator endpoint tests ---
+
+
+class TestAddEndpoint:
+    """Tests for POST /add."""
+
+    def test_requires_auth(self, client: TestClient):
+        response = client.post("/add", json={"a": 1, "b": 2})
+        assert response.status_code == 401
+
+    def test_add_two_numbers(self, client: TestClient, auth_headers: dict):
+        response = client.post("/add", json={"a": 5, "b": 3}, headers=auth_headers)
+        assert response.status_code == 200
+        assert response.json() == {"result": 8.0}
+
+    def test_add_negative_numbers(self, client: TestClient, auth_headers: dict):
+        response = client.post("/add", json={"a": -1, "b": -2}, headers=auth_headers)
+        assert response.status_code == 200
+        assert response.json() == {"result": -3.0}
+
+
+class TestSubtractEndpoint:
+    """Tests for POST /subtract."""
+
+    def test_requires_auth(self, client: TestClient):
+        response = client.post("/subtract", json={"a": 5, "b": 3})
+        assert response.status_code == 401
+
+    def test_subtract_two_numbers(self, client: TestClient, auth_headers: dict):
+        response = client.post("/subtract", json={"a": 10, "b": 4}, headers=auth_headers)
+        assert response.status_code == 200
+        assert response.json() == {"result": 6.0}
+
+
+class TestMultiplyEndpoint:
+    """Tests for POST /multiply."""
+
+    def test_requires_auth(self, client: TestClient):
+        response = client.post("/multiply", json={"a": 2, "b": 3})
+        assert response.status_code == 401
+
+    def test_multiply_two_numbers(self, client: TestClient, auth_headers: dict):
+        response = client.post("/multiply", json={"a": 7, "b": 6}, headers=auth_headers)
+        assert response.status_code == 200
+        assert response.json() == {"result": 42.0}
+
+
+class TestDivideEndpoint:
+    """Tests for POST /divide."""
+
+    def test_requires_auth(self, client: TestClient):
+        response = client.post("/divide", json={"a": 10, "b": 2})
+        assert response.status_code == 401
+
+    def test_divide_two_numbers(self, client: TestClient, auth_headers: dict):
+        response = client.post("/divide", json={"a": 10, "b": 4}, headers=auth_headers)
+        assert response.status_code == 200
+        assert response.json() == {"result": 2.5}
+
+    def test_divide_by_zero(self, client: TestClient, auth_headers: dict):
+        response = client.post("/divide", json={"a": 1, "b": 0}, headers=auth_headers)
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Cannot divide by zero"
