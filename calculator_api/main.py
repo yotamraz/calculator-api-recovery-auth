@@ -29,11 +29,12 @@ def health_check() -> HealthResponse:
     return HealthResponse(status="ok", version=app.version)
 
 
-# --- Router inclusion (routes added in subsequent milestones) ---
-# from .routes import auth as auth_routes
-# from .routes import calculations as calc_routes
-# app.include_router(auth_routes.router, prefix="/auth", tags=["auth"])
-# app.include_router(calc_routes.router, tags=["calculations"])
+# --- Router inclusion ---
+from .routes import auth as auth_routes
+from .routes import calculations as calc_routes
+
+app.include_router(auth_routes.router, prefix="/auth", tags=["auth"])
+app.include_router(calc_routes.router, tags=["calculations"])
 
 
 def main() -> None:
