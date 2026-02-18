@@ -1,49 +1,38 @@
-"""Start the uvicorn server as a fully detached daemon process."""
+"""Start the FastAPI app using uvicorn programmatically with robust process management."""
+import multiprocessing
 import os
+import signal
 import sys
-import time
+
+
+def run_server():
+    """Run the uvicorn server - this function runs in a child process."""
+    # Ignore SIGHUP so server survives shell exit
+    signal.signal(signal.SIGHUP, signal.SIG_IGN)
+    # Create new session to fully detach
+    os.setsid()
+
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, log_level="info")
 
 
 def main():
-    # Get the path to the Python interpreter in the venv
-    python = sys.executable
+    # Ignore SIGHUP so parent survives shell exit
+    signal.signal(signal.SIGHUP, signal.SIG_IGN)
 
-    # Double-fork to fully detach from the parent process (Unix daemon pattern)
-    pid = os.fork()
-    if pid > 0:
-        # Parent process: wait briefly for daemon to initialize, then exit
-        time.sleep(1)
-        print("Server daemon launched")
-        sys.exit(0)
+    # Use fork-based multiprocessing to start server
+    proc = multiprocessing.Process(target=run_server, daemon=False)
+    proc.start()
 
-    # First child: create new session to detach from terminal
-    os.setsid()
-
-    # Second fork to prevent reacquiring a terminal
-    pid = os.fork()
-    if pid > 0:
-        os._exit(0)
-
-    # Grandchild (daemon): fully detached from terminal and parent
-    # Redirect file descriptors
-    log = open("uvicorn.log", "w")
-
-    # Write PID file
+    # Write PID for cleanup
     with open("uvicorn.pid", "w") as f:
-        f.write(str(os.getpid()))
+        f.write(str(proc.pid))
 
-    # Redirect stdout/stderr to log file
-    os.dup2(log.fileno(), 1)
-    os.dup2(log.fileno(), 2)
+    print(f"Server started with PID {proc.pid}", flush=True)
 
-    # Replace this process with uvicorn
-    os.execvp(python, [
-        python, "-m", "uvicorn",
-        "app.main:app",
-        "--host", "0.0.0.0",
-        "--port", "8000",
-    ])
+    # Parent exits immediately - child continues in its own session
 
 
 if __name__ == "__main__":
+    multiprocessing.set_start_method("fork")
     main()
