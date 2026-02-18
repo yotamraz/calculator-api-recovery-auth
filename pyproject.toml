@@ -1,0 +1,35 @@
+[project]
+name = "calculator-api-recovery-auth"
+version = "0.1.0"
+description = "A simple calculator REST API"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "sqlmodel>=0.0.22",
+    "PyJWT>=2.9.0",
+    "bcrypt>=4.0.0",
+    "python-multipart>=0.0.9",
+    "pydantic-settings>=2.6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27.0",
+]
+
+[project.scripts]
+calculator-api = "calculator_api.main:main"
+
+[tool.setuptools]
+packages = ["calculator_api", "calculator_api.routes"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.pyright]
+typeCheckingMode = "basic"
