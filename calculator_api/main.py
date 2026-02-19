@@ -8,6 +8,7 @@ from fastapi import FastAPI
 
 from .database import init_db
 from .models import HealthResponse
+from .routes import auth as auth_routes
 from .routes import calculations as calc_routes
 
 
@@ -32,6 +33,7 @@ def health_check() -> HealthResponse:
 
 # --- Include Routers ---
 
+app.include_router(auth_routes.router, prefix="/auth", tags=["auth"])
 app.include_router(calc_routes.router, tags=["calculations"])
 
 

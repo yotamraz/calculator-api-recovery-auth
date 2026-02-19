@@ -10,7 +10,8 @@ engine = create_engine(get_settings().database_url, echo=False)
 
 
 def init_db() -> None:
-    """Create all database tables. Called at application startup."""
+    """Drop and recreate all database tables. Called at application startup."""
+    SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
 
 
