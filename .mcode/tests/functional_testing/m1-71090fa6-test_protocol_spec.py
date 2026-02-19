@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-19T22:09:39.837151+00:00
+Generated at: 2026-02-19T22:24:01.483294+00:00
 Project: calculator-api-recovery-auth
 Milestone: 1
 """
@@ -170,6 +170,7 @@ TEST_CASES = json.loads(r'''[
         "endpoint": "/add",
         "method": "POST",
         "description": "Attempt to add without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -207,6 +208,7 @@ TEST_CASES = json.loads(r'''[
         "endpoint": "/subtract",
         "method": "POST",
         "description": "Attempt to subtract without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -244,6 +246,7 @@ TEST_CASES = json.loads(r'''[
         "endpoint": "/multiply",
         "method": "POST",
         "description": "Attempt to multiply without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -300,6 +303,7 @@ TEST_CASES = json.loads(r'''[
         "endpoint": "/divide",
         "method": "POST",
         "description": "Attempt to divide without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -358,6 +362,7 @@ TEST_CASES = json.loads(r'''[
         "endpoint": "/calculations",
         "method": "POST",
         "description": "Attempt to create a calculation without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -393,6 +398,7 @@ TEST_CASES = json.loads(r'''[
         "endpoint": "/calculations",
         "method": "GET",
         "description": "Attempt to list calculations without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
