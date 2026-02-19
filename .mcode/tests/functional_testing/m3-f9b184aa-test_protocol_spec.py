@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-19T22:11:49.441735+00:00
+Generated at: 2026-02-19T22:18:11.450156+00:00
 Project: calculator-api-recovery-auth
 Milestone: 3
 """
@@ -42,9 +42,6 @@ TEST_CASES = json.loads(r'''[
                 "operation": "add",
                 "a": 10.5,
                 "b": 3.2
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 201,
@@ -64,9 +61,6 @@ TEST_CASES = json.loads(r'''[
                 "operation": "modulo",
                 "a": 10.0,
                 "b": 3.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 400,
@@ -86,9 +80,6 @@ TEST_CASES = json.loads(r'''[
                 "operation": "div",
                 "a": 10.0,
                 "b": 0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 400,
@@ -101,6 +92,7 @@ TEST_CASES = json.loads(r'''[
         "endpoint": "/calculations",
         "method": "POST",
         "description": "Attempt to create a calculation without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -123,10 +115,7 @@ TEST_CASES = json.loads(r'''[
         "request_data": {
             "path": {},
             "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
+            "body": null
         },
         "expected_status": 200,
         "setup": {
@@ -137,9 +126,6 @@ TEST_CASES = json.loads(r'''[
                 "a": 4.0,
                 "b": 5.0
             },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "extract_id_from": "id"
         },
         "cleanup": {
@@ -147,9 +133,6 @@ TEST_CASES = json.loads(r'''[
             "method": "DELETE",
             "path": {
                 "calculation_id": "$setup_id"
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         }
     },
@@ -159,6 +142,7 @@ TEST_CASES = json.loads(r'''[
         "endpoint": "/calculations",
         "method": "GET",
         "description": "Attempt to list calculations without authentication and expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -179,10 +163,7 @@ TEST_CASES = json.loads(r'''[
                 "calculation_id": "$setup_id"
             },
             "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
+            "body": null
         },
         "expected_status": 200,
         "setup": {
@@ -193,9 +174,6 @@ TEST_CASES = json.loads(r'''[
                 "a": 20.0,
                 "b": 7.5
             },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "extract_id_from": "id"
         },
         "cleanup": {
@@ -203,9 +181,6 @@ TEST_CASES = json.loads(r'''[
             "method": "DELETE",
             "path": {
                 "calculation_id": "$setup_id"
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         }
     },
@@ -220,10 +195,7 @@ TEST_CASES = json.loads(r'''[
                 "calculation_id": 999999
             },
             "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
+            "body": null
         },
         "expected_status": 404,
         "setup": null,
@@ -240,10 +212,7 @@ TEST_CASES = json.loads(r'''[
                 "calculation_id": "$setup_id"
             },
             "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
+            "body": null
         },
         "expected_status": 204,
         "setup": {
@@ -253,9 +222,6 @@ TEST_CASES = json.loads(r'''[
                 "operation": "add",
                 "a": 100.0,
                 "b": 200.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             },
             "extract_id_from": "id"
         },
@@ -272,10 +238,7 @@ TEST_CASES = json.loads(r'''[
                 "calculation_id": 999999
             },
             "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
+            "body": null
         },
         "expected_status": 404,
         "setup": null,
