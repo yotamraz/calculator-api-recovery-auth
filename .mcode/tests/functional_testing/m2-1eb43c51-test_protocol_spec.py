@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-19T21:41:31.983716+00:00
+Generated at: 2026-02-19T21:54:44.378359+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -44,6 +44,7 @@ TEST_CASES = json.loads(r'''[
             }
         },
         "expected_status": 201,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     },
@@ -70,6 +71,7 @@ TEST_CASES = json.loads(r'''[
             }
         },
         "expected_status": 400,
+        "skip_auth": true,
         "cleanup": null
     },
     {
@@ -86,6 +88,7 @@ TEST_CASES = json.loads(r'''[
             }
         },
         "expected_status": 422,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     },
@@ -113,6 +116,7 @@ TEST_CASES = json.loads(r'''[
             "content_type": "application/x-www-form-urlencoded"
         },
         "expected_status": 200,
+        "skip_auth": true,
         "cleanup": null
     },
     {
@@ -139,6 +143,7 @@ TEST_CASES = json.loads(r'''[
             "content_type": "application/x-www-form-urlencoded"
         },
         "expected_status": 401,
+        "skip_auth": true,
         "cleanup": null
     },
     {
@@ -157,6 +162,7 @@ TEST_CASES = json.loads(r'''[
             "content_type": "application/x-www-form-urlencoded"
         },
         "expected_status": 401,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     },
@@ -194,6 +200,7 @@ TEST_CASES = json.loads(r'''[
             }
         },
         "expected_status": 401,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     },
@@ -250,6 +257,7 @@ TEST_CASES = json.loads(r'''[
             }
         },
         "expected_status": 401,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     },
@@ -287,6 +295,7 @@ TEST_CASES = json.loads(r'''[
             }
         },
         "expected_status": 401,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     },
@@ -362,6 +371,7 @@ TEST_CASES = json.loads(r'''[
             }
         },
         "expected_status": 401,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     }
