@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-19T21:49:21.549720+00:00
+Generated at: 2026-02-19T22:02:37.976890+00:00
 Project: calculator-api-recovery-auth
 Milestone: 1
 """
@@ -107,16 +107,14 @@ TEST_CASES = json.loads(r'''[
         "category": "HAPPY_PATH",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Login with valid credentials using form-encoded body and receive JWT token",
-        "content_type": "application/x-www-form-urlencoded",
+        "description": "Login with valid credentials and receive JWT token",
         "request_data": {
             "path": {},
             "query": {},
-            "form_data": {
+            "body": {
                 "username": "login_test_user",
                 "password": "loginPass789"
-            },
-            "content_type": "application/x-www-form-urlencoded"
+            }
         },
         "expected_status": 200,
         "setup": {
@@ -135,15 +133,13 @@ TEST_CASES = json.loads(r'''[
         "endpoint": "/auth/token",
         "method": "POST",
         "description": "Attempt login with wrong password and expect 401",
-        "content_type": "application/x-www-form-urlencoded",
         "request_data": {
             "path": {},
             "query": {},
-            "form_data": {
+            "body": {
                 "username": "nonexistent_user",
                 "password": "wrongPassword"
-            },
-            "content_type": "application/x-www-form-urlencoded"
+            }
         },
         "expected_status": 401,
         "setup": null,
