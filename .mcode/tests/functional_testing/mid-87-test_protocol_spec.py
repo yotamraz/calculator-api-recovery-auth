@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-19T09:51:00.574252+00:00
+Generated at: 2026-02-19T09:53:59.247473+00:00
 Project: calculator-api-recovery-auth
 Milestone: 87
 """
@@ -75,7 +75,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_reg1",
+                "username": "fresh_register_user_hp",
                 "password": "${AUTH_PASSWORD}"
             }
         },
@@ -93,7 +93,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "duplicate_user",
+                "username": "duplicate_user_test",
                 "password": "${AUTH_PASSWORD}"
             },
             "extract_id_from": "id"
@@ -102,7 +102,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "path": {},
             "query": {},
             "body": {
-                "username": "duplicate_user",
+                "username": "duplicate_user_test",
                 "password": "${AUTH_PASSWORD}"
             }
         },
