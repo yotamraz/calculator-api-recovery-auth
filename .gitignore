@@ -88,6 +88,7 @@ replay_pid*
 
 # ----- Project-specific -----
 calculator.db
+calculator-api
 
 # ----- C# / .NET -----
 [Bb]in/
