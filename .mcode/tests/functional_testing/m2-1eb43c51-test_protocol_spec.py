@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-19T21:57:27.077276+00:00
+Generated at: 2026-02-19T22:02:06.022105+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -39,7 +39,7 @@ TEST_CASES = json.loads(r'''[
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_reg1",
+                "username": "fresh_register_user_m3q8",
                 "password": "securePassword123"
             }
         },
@@ -58,15 +58,16 @@ TEST_CASES = json.loads(r'''[
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "duplicate_user",
+                "username": "dup_check_user_p4w2",
                 "password": "password123"
-            }
+            },
+            "required": false
         },
         "request_data": {
             "path": {},
             "query": {},
             "body": {
-                "username": "duplicate_user",
+                "username": "dup_check_user_p4w2",
                 "password": "differentPassword456"
             }
         },
@@ -84,7 +85,7 @@ TEST_CASES = json.loads(r'''[
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_nopw"
+                "username": "testuser_nopw_r5t1"
             }
         },
         "expected_status": 422,
@@ -102,15 +103,16 @@ TEST_CASES = json.loads(r'''[
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "loginuser1",
+                "username": "login_ok_user_n6j3",
                 "password": "myPassword789"
-            }
+            },
+            "required": false
         },
         "request_data": {
             "path": {},
             "query": {},
             "body": {
-                "username": "loginuser1",
+                "username": "login_ok_user_n6j3",
                 "password": "myPassword789"
             },
             "content_type": "application/x-www-form-urlencoded"
@@ -129,15 +131,16 @@ TEST_CASES = json.loads(r'''[
             "endpoint": "/auth/register",
             "method": "POST",
             "body": {
-                "username": "loginuser2",
+                "username": "login_badpw_user_h8v5",
                 "password": "correctPassword"
-            }
+            },
+            "required": false
         },
         "request_data": {
             "path": {},
             "query": {},
             "body": {
-                "username": "loginuser2",
+                "username": "login_badpw_user_h8v5",
                 "password": "wrongPassword"
             },
             "content_type": "application/x-www-form-urlencoded"
