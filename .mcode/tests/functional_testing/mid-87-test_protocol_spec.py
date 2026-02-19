@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-19T09:47:36.110982+00:00
+Generated at: 2026-02-19T09:51:00.574252+00:00
 Project: calculator-api-recovery-auth
 Milestone: 87
 """
@@ -50,6 +50,21 @@ def resolve_env_placeholders(obj: Any) -> Any:
 # that the agent may have substituted for detected secrets.
 TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     json.loads(r'''[
+    {
+        "name": "health_check_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/health",
+        "method": "GET",
+        "description": "Health check returns 200 with status ok and version",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {}
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
     {
         "name": "register_user_happy_path",
         "category": "HAPPY_PATH",
@@ -220,6 +235,338 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "content_type": "application/x-www-form-urlencoded"
         },
         "expected_status": 422,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "add_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/add",
+        "method": "POST",
+        "description": "Add two numbers with valid auth, expect 200 with result",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 5,
+                "b": 3
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "add_no_auth",
+        "category": "UNAUTHORIZED",
+        "endpoint": "/add",
+        "method": "POST",
+        "description": "Add two numbers without auth token, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 5,
+                "b": 3
+            }
+        },
+        "expected_status": 401,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "subtract_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/subtract",
+        "method": "POST",
+        "description": "Subtract two numbers with valid auth, expect 200 with result",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 10,
+                "b": 4
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "multiply_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/multiply",
+        "method": "POST",
+        "description": "Multiply two numbers with valid auth, expect 200 with result",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 7,
+                "b": 6
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "divide_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/divide",
+        "method": "POST",
+        "description": "Divide two numbers with valid auth, expect 200 with result",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 20,
+                "b": 4
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "divide_by_zero",
+        "category": "INVALID_INPUT",
+        "endpoint": "/divide",
+        "method": "POST",
+        "description": "Divide by zero with valid auth, expect 400 with error message",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 10,
+                "b": 0
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 400,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "create_calculation_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations",
+        "method": "POST",
+        "description": "Create a calculation record with valid auth, expect 201 with calculation details",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "operation": "add",
+                "a": 5,
+                "b": 3
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 201,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "create_calculation_invalid_operation",
+        "category": "INVALID_INPUT",
+        "endpoint": "/calculations",
+        "method": "POST",
+        "description": "Create a calculation with an invalid operation, expect 400",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "operation": "modulo",
+                "a": 5,
+                "b": 3
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 400,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "create_calculation_no_auth",
+        "category": "UNAUTHORIZED",
+        "endpoint": "/calculations",
+        "method": "POST",
+        "description": "Create a calculation without auth, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "operation": "add",
+                "a": 5,
+                "b": 3
+            }
+        },
+        "expected_status": 401,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "list_calculations_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations",
+        "method": "GET",
+        "description": "List all calculations with valid auth, expect 200 with array",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "list_calculations_no_auth",
+        "category": "UNAUTHORIZED",
+        "endpoint": "/calculations",
+        "method": "GET",
+        "description": "List calculations without auth, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {}
+        },
+        "expected_status": 401,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "get_calculation_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "GET",
+        "description": "Get a specific calculation by ID with valid auth, expect 200",
+        "setup": {
+            "endpoint": "/calculations",
+            "method": "POST",
+            "body": {
+                "operation": "mul",
+                "a": 7,
+                "b": 6
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "extract_id_from": "id"
+        },
+        "request_data": {
+            "path": {
+                "calculation_id": "$setup_id"
+            },
+            "query": {},
+            "body": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "cleanup": {
+            "endpoint": "/calculations/{calculation_id}",
+            "method": "DELETE",
+            "path": {
+                "calculation_id": "$setup_id"
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        }
+    },
+    {
+        "name": "get_calculation_not_found",
+        "category": "INVALID_INPUT",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "GET",
+        "description": "Get a non-existing calculation by ID, expect 404",
+        "request_data": {
+            "path": {
+                "calculation_id": 999999
+            },
+            "query": {},
+            "body": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 404,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "delete_calculation_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "DELETE",
+        "description": "Delete a calculation by ID with valid auth, expect 204",
+        "setup": {
+            "endpoint": "/calculations",
+            "method": "POST",
+            "body": {
+                "operation": "sub",
+                "a": 10,
+                "b": 3
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "extract_id_from": "id"
+        },
+        "request_data": {
+            "path": {
+                "calculation_id": "$setup_id"
+            },
+            "query": {},
+            "body": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 204,
+        "cleanup": null
+    },
+    {
+        "name": "delete_calculation_not_found",
+        "category": "INVALID_INPUT",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "DELETE",
+        "description": "Delete a non-existing calculation, expect 404",
+        "request_data": {
+            "path": {
+                "calculation_id": 999999
+            },
+            "query": {},
+            "body": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 404,
         "setup": null,
         "cleanup": null
     }
