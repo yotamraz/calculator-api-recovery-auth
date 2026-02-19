@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-19T09:48:30.150752+00:00
+Generated at: 2026-02-19T09:52:57.881542+00:00
 Project: calculator-api-recovery-auth
 Milestone: 86
 """
@@ -127,7 +127,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     },
     {
         "name": "login_happy_path",
-        "category": "HAPPY_PATH",
+        "category": "AUTH",
         "endpoint": "/auth/token",
         "method": "POST",
         "description": "Login with valid credentials using OAuth2 form data and receive a JWT access token",
@@ -211,9 +211,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 10.5,
                 "b": 5.3
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 200,
@@ -225,6 +222,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/add",
         "method": "POST",
+        "skip_auth": true,
         "description": "Add endpoint without authentication returns 401",
         "request_data": {
             "path": {},
@@ -250,9 +248,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 20.0,
                 "b": 7.5
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 200,
@@ -264,6 +259,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/subtract",
         "method": "POST",
+        "skip_auth": true,
         "description": "Subtract endpoint without authentication returns 401",
         "request_data": {
             "path": {},
@@ -289,9 +285,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 6.0,
                 "b": 7.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 200,
@@ -303,6 +296,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/multiply",
         "method": "POST",
+        "skip_auth": true,
         "description": "Multiply endpoint without authentication returns 401",
         "request_data": {
             "path": {},
@@ -328,9 +322,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 100.0,
                 "b": 4.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 200,
@@ -349,9 +340,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 10.0,
                 "b": 0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 400,
@@ -363,6 +351,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/divide",
         "method": "POST",
+        "skip_auth": true,
         "description": "Divide endpoint without authentication returns 401",
         "request_data": {
             "path": {},
@@ -389,9 +378,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "operation": "add",
                 "a": 15.0,
                 "b": 25.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 201,
@@ -411,9 +397,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "operation": "modulo",
                 "a": 10.0,
                 "b": 3.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 400,
@@ -433,9 +416,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "operation": "div",
                 "a": 10.0,
                 "b": 0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 400,
@@ -447,6 +427,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/calculations",
         "method": "POST",
+        "skip_auth": true,
         "description": "Create calculation without authentication returns 401",
         "request_data": {
             "path": {},
@@ -470,10 +451,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
+            "body": null
         },
         "expected_status": 200,
         "setup": null,
@@ -484,6 +462,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/calculations",
         "method": "GET",
+        "skip_auth": true,
         "description": "List calculations without authentication returns 401",
         "request_data": {
             "path": {},
@@ -508,9 +487,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "a": 3.0,
                 "b": 9.0
             },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "extract_id_from": "id"
         },
         "request_data": {
@@ -518,10 +494,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": "$setup_id"
             },
             "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
+            "body": null
         },
         "expected_status": 200,
         "cleanup": {
@@ -529,9 +502,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "method": "DELETE",
             "path": {
                 "calculation_id": "$setup_id"
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         }
     },
@@ -546,10 +516,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": 999999
             },
             "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
+            "body": null
         },
         "expected_status": 404,
         "setup": null,
@@ -569,9 +536,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "a": 50.0,
                 "b": 20.0
             },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "extract_id_from": "id"
         },
         "request_data": {
@@ -579,10 +543,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": "$setup_id"
             },
             "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
+            "body": null
         },
         "expected_status": 204,
         "cleanup": null
@@ -598,10 +559,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": 999999
             },
             "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
+            "body": null
         },
         "expected_status": 404,
         "setup": null,
