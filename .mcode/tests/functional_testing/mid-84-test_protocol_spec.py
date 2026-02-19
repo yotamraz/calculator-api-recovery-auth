@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-19T08:48:47.294376+00:00
+Generated at: 2026-02-19T08:52:02.258168+00:00
 Project: calculator-api-recovery-auth
 Milestone: 84
 """
@@ -134,6 +134,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "content_type": "application/x-www-form-urlencoded"
         },
         "expected_status": 200,
+        "store_auth": {
+            "headers": {
+                "Authorization": "Bearer {access_token}"
+            }
+        },
         "cleanup": null
     },
     {
@@ -187,6 +192,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/add",
         "method": "POST",
         "description": "Access a protected calculator endpoint without providing a Bearer token, expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -206,6 +212,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/add",
         "method": "POST",
         "description": "Access a protected endpoint with an invalid/malformed Bearer token, expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -233,9 +240,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 5,
                 "b": 3
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 200,
