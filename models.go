@@ -37,16 +37,18 @@ type LoginForm struct {
 }
 
 // CalculationRequest is the request body for calculator endpoints (/add, /subtract, etc.).
+// Note: float64 fields omit binding:"required" because Go treats 0 as the zero value,
+// which would incorrectly reject valid inputs like a=0 or b=0.
 type CalculationRequest struct {
-	A float64 `json:"a" binding:"required"`
-	B float64 `json:"b" binding:"required"`
+	A float64 `json:"a"`
+	B float64 `json:"b"`
 }
 
 // CalculationCreate is the request body for creating a stored calculation.
 type CalculationCreate struct {
 	Operation string  `json:"operation" binding:"required"`
-	A         float64 `json:"a" binding:"required"`
-	B         float64 `json:"b" binding:"required"`
+	A         float64 `json:"a"`
+	B         float64 `json:"b"`
 }
 
 // ---- Response Structs ----
