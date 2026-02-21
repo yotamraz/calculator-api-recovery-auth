@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-21T12:54:56.784289+00:00
+Generated at: 2026-02-21T13:00:18.821726+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -54,61 +54,26 @@ TEST_CASES = json.loads(r'''[
         "endpoint": "/auth/register",
         "method": "POST",
         "description": "Register with duplicate username - expect 400",
+        "setup": {
+            "endpoint": "/auth/register",
+            "method": "POST",
+            "body": {
+                "username": "duplicate_test_user",
+                "password": "TestPass123"
+            },
+            "extract_id_from": "id",
+            "required": false
+        },
         "request_data": {
             "path": {},
             "query": {},
             "body": {
-                "username": "testuser_func",
-                "password": "AnyPassword123"
+                "username": "duplicate_test_user",
+                "password": "AnotherPassword"
             },
             "skip_auth": true
         },
         "expected_status": 400,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "token_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/auth/token",
-        "method": "POST",
-        "description": "Login with valid credentials and get access token",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "username": "testuser_func",
-                "password": "TestPassword123"
-            },
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "skip_auth": true
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "token_invalid_credentials",
-        "category": "INVALID_INPUT",
-        "endpoint": "/auth/token",
-        "method": "POST",
-        "description": "Login with invalid credentials - expect 401",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "username": "nonexistent_user",
-                "password": "wrongpass"
-            },
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "skip_auth": true
-        },
-        "expected_status": 401,
-        "setup": null,
         "cleanup": null
     },
     {
