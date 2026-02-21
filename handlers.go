@@ -1,12 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"bytes"
+	"encoding/json"
+	"errors"
+	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 // ---- Health Check ----
@@ -19,13 +24,75 @@ func healthCheck(c *gin.Context) {
 	})
 }
 
+// ---- Validation Error Helpers ----
+
+// fieldJSONName returns the JSON tag name for a struct field, falling back to lowercase.
+func fieldJSONName(field string) string {
+	// Map Go struct field names to their JSON tag equivalents
+	fieldMap := map[string]string{
+		"Username":  "username",
+		"Password":  "password",
+		"Operation": "operation",
+		"A":         "a",
+		"B":         "b",
+	}
+	if name, ok := fieldMap[field]; ok {
+		return name
+	}
+	return strings.ToLower(field)
+}
+
+// formatValidationErrors converts Gin/validator errors to FastAPI-compatible format.
+func formatValidationErrors(err error, rawBody json.RawMessage) interface{} {
+	var ve validator.ValidationErrors
+	if errors.As(err, &ve) {
+		var rawInput interface{}
+		json.Unmarshal(rawBody, &rawInput)
+
+		details := make([]map[string]interface{}, 0, len(ve))
+		for _, fe := range ve {
+			errType := "value_error"
+			msg := "Invalid value"
+			if fe.Tag() == "required" {
+				errType = "missing"
+				msg = "Field required"
+			}
+			detail := map[string]interface{}{
+				"type":  errType,
+				"loc":   []string{"body", fieldJSONName(fe.Field())},
+				"msg":   msg,
+				"input": rawInput,
+			}
+			details = append(details, detail)
+		}
+		return gin.H{"detail": details}
+	}
+	return gin.H{"detail": "Invalid request body"}
+}
+
+// bindJSONWithValidation binds JSON and returns FastAPI-compatible errors on failure.
+// Returns (bodyBytes, error). If error is non-nil, the error response has already been sent.
+func bindJSONWithValidation(c *gin.Context, obj interface{}) (json.RawMessage, bool) {
+	bodyBytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": "Invalid request body"})
+		return nil, false
+	}
+	c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	if err := c.ShouldBindJSON(obj); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, formatValidationErrors(err, bodyBytes))
+		return nil, false
+	}
+	return bodyBytes, true
+}
+
 // ---- Auth Endpoints ----
 
 // register handles POST /auth/register.
 func register(c *gin.Context) {
 	var req UserCreate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{Detail: "Invalid request body"})
+	if _, ok := bindJSONWithValidation(c, &req); !ok {
 		return
 	}
 
@@ -156,9 +223,8 @@ func createCalculation(c *gin.Context) {
 	} else if fn, ok := OPERATIONS[req.Operation]; ok {
 		result = fn(req.A, req.B)
 	} else {
-		validOps := []string{"add", "sub", "mul", "div"}
 		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Detail: fmt.Sprintf("Unknown operation: %s. Use: %v", req.Operation, validOps),
+			Detail: "Unknown operation: " + req.Operation + ". Use: ['add', 'sub', 'mul', 'div']",
 		})
 		return
 	}
