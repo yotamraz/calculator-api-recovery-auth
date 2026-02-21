@@ -85,6 +85,7 @@ replay_pid*
 *.test
 *.out
 *.coverprofile
+calculator-api
 calculator.db
 calculator.db-journal
 calculator.db-wal
