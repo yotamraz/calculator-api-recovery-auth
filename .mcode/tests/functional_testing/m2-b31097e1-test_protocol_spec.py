@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-21T12:47:42.942884+00:00
+Generated at: 2026-02-21T12:54:56.784289+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -29,6 +29,88 @@ import requests
 
 # Parse JSON at runtime to handle null -> None, true -> True, false -> False
 TEST_CASES = json.loads(r'''[
+    {
+        "name": "register_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/auth/register",
+        "method": "POST",
+        "description": "Register a new user successfully",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "username": "test_register_user",
+                "password": "SecurePass456"
+            },
+            "skip_auth": true
+        },
+        "expected_status": 201,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "register_duplicate_username",
+        "category": "INVALID_INPUT",
+        "endpoint": "/auth/register",
+        "method": "POST",
+        "description": "Register with duplicate username - expect 400",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "username": "testuser_func",
+                "password": "AnyPassword123"
+            },
+            "skip_auth": true
+        },
+        "expected_status": 400,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "token_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/auth/token",
+        "method": "POST",
+        "description": "Login with valid credentials and get access token",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "username": "testuser_func",
+                "password": "TestPassword123"
+            },
+            "headers": {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            "skip_auth": true
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "token_invalid_credentials",
+        "category": "INVALID_INPUT",
+        "endpoint": "/auth/token",
+        "method": "POST",
+        "description": "Login with invalid credentials - expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "username": "nonexistent_user",
+                "password": "wrongpass"
+            },
+            "headers": {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            "skip_auth": true
+        },
+        "expected_status": 401,
+        "setup": null,
+        "cleanup": null
+    },
     {
         "name": "add_happy_path",
         "category": "HAPPY_PATH",
