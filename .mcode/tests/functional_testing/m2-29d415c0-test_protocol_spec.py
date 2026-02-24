@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-24T14:21:09.385092+00:00
+Generated at: 2026-02-24T14:36:22.550287+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -66,6 +66,24 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
+        "name": "register_testuser",
+        "category": "SETUP",
+        "endpoint": "/auth/register",
+        "method": "POST",
+        "description": "Register testuser account needed by login and duplicate-registration tests",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "username": "testuser",
+                "password": "testpass123"
+            }
+        },
+        "expected_status": 201,
+        "setup": null,
+        "cleanup": null
+    },
+    {
         "name": "register_user",
         "category": "HAPPY_PATH",
         "endpoint": "/auth/register",
@@ -74,7 +92,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {},
             "body": {
                 "username": "registertest",
                 "password": "pass1234"
@@ -93,7 +110,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {},
             "body": {
                 "username": "testuser",
                 "password": "testpass123"
@@ -105,20 +121,18 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     },
     {
         "name": "login_happy_path",
-        "category": "HAPPY_PATH",
+        "category": "SETUP",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Login with valid credentials and get JWT token",
+        "description": "Login with valid credentials and get JWT token (propagates auth to session)",
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
             "body": {
                 "username": "testuser",
                 "password": "testpass123"
-            }
+            },
+            "content_type": "form"
         },
         "expected_status": 200,
         "setup": null,
@@ -133,13 +147,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
             "body": {
                 "username": "nonexistent",
                 "password": "wrongpass"
-            }
+            },
+            "content_type": "form"
         },
         "expected_status": 401,
         "setup": null,
@@ -154,9 +166,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "a": 10.5,
                 "b": 3.2
@@ -175,9 +184,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "a": -5.0,
                 "b": -3.0
@@ -193,6 +199,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/add",
         "method": "POST",
         "description": "Attempt to add without authentication token, expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -214,9 +221,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "a": 20.0,
                 "b": 7.5
@@ -232,6 +236,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/subtract",
         "method": "POST",
         "description": "Attempt to subtract without authentication token, expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -253,9 +258,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "a": 4.0,
                 "b": 5.5
@@ -274,9 +276,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "a": 99.9,
                 "b": 0.0
@@ -292,6 +291,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/multiply",
         "method": "POST",
         "description": "Attempt to multiply without authentication token, expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -313,9 +313,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "a": 20.0,
                 "b": 4.0
@@ -334,9 +331,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "a": 10.0,
                 "b": 0.0
@@ -352,6 +346,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/divide",
         "method": "POST",
         "description": "Attempt to divide without authentication token, expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -373,9 +368,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "operation": "add",
                 "a": 15.0,
@@ -395,9 +387,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "operation": "modulo",
                 "a": 10.0,
@@ -417,9 +406,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "operation": "div",
                 "a": 10.0,
@@ -436,6 +422,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/calculations",
         "method": "POST",
         "description": "Attempt to create a calculation without authentication, expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -458,9 +445,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": null
         },
         "expected_status": 200,
@@ -473,6 +457,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/calculations",
         "method": "GET",
         "description": "Attempt to list calculations without authentication, expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {},
             "query": {},
@@ -491,9 +476,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "setup": {
             "endpoint": "/calculations",
             "method": "POST",
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "operation": "mul",
                 "a": 6.0,
@@ -506,18 +488,12 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": "$setup_id"
             },
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": null
         },
         "expected_status": 200,
         "cleanup": {
             "endpoint": "/calculations/{calculation_id}",
             "method": "DELETE",
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "path": {
                 "calculation_id": "$setup_id"
             }
@@ -534,9 +510,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": 999999
             },
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": null
         },
         "expected_status": 404,
@@ -549,6 +522,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/calculations/{calculation_id}",
         "method": "GET",
         "description": "Attempt to get a calculation without authentication, expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {
                 "calculation_id": 1
@@ -569,9 +543,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "setup": {
             "endpoint": "/calculations",
             "method": "POST",
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "operation": "sub",
                 "a": 50.0,
@@ -584,9 +555,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": "$setup_id"
             },
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": null
         },
         "expected_status": 204,
@@ -603,9 +571,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "calculation_id": 999999
             },
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": null
         },
         "expected_status": 404,
@@ -618,6 +583,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/calculations/{calculation_id}",
         "method": "DELETE",
         "description": "Attempt to delete a calculation without authentication, expect 401",
+        "skip_auth": true,
         "request_data": {
             "path": {
                 "calculation_id": 1
