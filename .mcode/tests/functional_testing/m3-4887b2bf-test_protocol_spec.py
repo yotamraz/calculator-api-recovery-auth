@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-24T16:17:35.000255+00:00
+Generated at: 2026-02-24T16:24:36.462678+00:00
 Project: calculator-api-auth
 Milestone: 3
 """
@@ -51,6 +51,35 @@ def resolve_env_placeholders(obj: Any) -> Any:
 TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     json.loads(r'''[
     {
+        "name": "login_user",
+        "category": "AUTH",
+        "endpoint": "/auth/token",
+        "method": "POST",
+        "description": "Register a test user then login to obtain a JWT access token for subsequent tests",
+        "setup": {
+            "endpoint": "/auth/register",
+            "method": "POST",
+            "body": {
+                "username": "testuser",
+                "password": "secret123"
+            },
+            "extract_id_from": "id",
+            "required": false
+        },
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "username": "testuser",
+                "password": "secret123"
+            },
+            "content_type": "form"
+        },
+        "expected_status": 200,
+        "skip_auth": true,
+        "cleanup": null
+    },
+    {
         "name": "add_happy_path",
         "category": "HAPPY_PATH",
         "endpoint": "/add",
@@ -62,9 +91,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 5.0,
                 "b": 3.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 200,
@@ -83,30 +109,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": -10.5,
                 "b": -4.5
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "add_unauthorized",
-        "category": "AUTH",
-        "endpoint": "/add",
-        "method": "POST",
-        "description": "Attempt to add without authentication, expect 401",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "a": 1.0,
-                "b": 2.0
-            }
-        },
-        "expected_status": 401,
         "setup": null,
         "cleanup": null
     },
@@ -122,30 +127,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 10.0,
                 "b": 3.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "subtract_unauthorized",
-        "category": "AUTH",
-        "endpoint": "/subtract",
-        "method": "POST",
-        "description": "Attempt to subtract without authentication, expect 401",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "a": 5.0,
-                "b": 2.0
-            }
-        },
-        "expected_status": 401,
         "setup": null,
         "cleanup": null
     },
@@ -161,30 +145,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 7.0,
                 "b": 6.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "multiply_unauthorized",
-        "category": "AUTH",
-        "endpoint": "/multiply",
-        "method": "POST",
-        "description": "Attempt to multiply without authentication, expect 401",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "a": 3.0,
-                "b": 4.0
-            }
-        },
-        "expected_status": 401,
         "setup": null,
         "cleanup": null
     },
@@ -200,9 +163,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 20.0,
                 "b": 4.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 200,
@@ -221,30 +181,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": {
                 "a": 10.0,
                 "b": 0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 400,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "divide_unauthorized",
-        "category": "AUTH",
-        "endpoint": "/divide",
-        "method": "POST",
-        "description": "Attempt to divide without authentication, expect 401",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "a": 10.0,
-                "b": 2.0
-            }
-        },
-        "expected_status": 401,
         "setup": null,
         "cleanup": null
     },
@@ -261,9 +200,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "operation": "mul",
                 "a": 7.0,
                 "b": 6.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 201,
@@ -283,9 +219,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "operation": "modulo",
                 "a": 10.0,
                 "b": 3.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 400,
@@ -305,12 +238,192 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "operation": "div",
                 "a": 5.0,
                 "b": 0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             }
         },
         "expected_status": 400,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "list_calculations_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations",
+        "method": "GET",
+        "description": "List all stored calculations, expect 200 with an array response",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": null
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "get_calculation_by_id_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "GET",
+        "description": "Create a calculation, then retrieve it by ID, then delete it",
+        "setup": {
+            "endpoint": "/calculations",
+            "method": "POST",
+            "body": {
+                "operation": "add",
+                "a": 15.0,
+                "b": 25.0
+            },
+            "extract_id_from": "id"
+        },
+        "request_data": {
+            "path": {
+                "calculation_id": "$setup_id"
+            },
+            "query": {},
+            "body": null
+        },
+        "expected_status": 200,
+        "cleanup": {
+            "endpoint": "/calculations/{calculation_id}",
+            "method": "DELETE",
+            "path": {
+                "calculation_id": "$setup_id"
+            }
+        }
+    },
+    {
+        "name": "get_calculation_not_found",
+        "category": "NOT_FOUND",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "GET",
+        "description": "Attempt to retrieve a non-existent calculation, expect 404",
+        "request_data": {
+            "path": {
+                "calculation_id": 999999
+            },
+            "query": {},
+            "body": null
+        },
+        "expected_status": 404,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "delete_calculation_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "DELETE",
+        "description": "Create a calculation, then delete it and verify 204 response",
+        "setup": {
+            "endpoint": "/calculations",
+            "method": "POST",
+            "body": {
+                "operation": "sub",
+                "a": 100.0,
+                "b": 50.0
+            },
+            "extract_id_from": "id"
+        },
+        "request_data": {
+            "path": {
+                "calculation_id": "$setup_id"
+            },
+            "query": {},
+            "body": null
+        },
+        "expected_status": 204,
+        "cleanup": null
+    },
+    {
+        "name": "delete_calculation_not_found",
+        "category": "NOT_FOUND",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "DELETE",
+        "description": "Attempt to delete a non-existent calculation, expect 404",
+        "request_data": {
+            "path": {
+                "calculation_id": 999999
+            },
+            "query": {},
+            "body": null
+        },
+        "expected_status": 404,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "add_unauthorized",
+        "category": "AUTH",
+        "endpoint": "/add",
+        "method": "POST",
+        "description": "Attempt to add without authentication, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 1.0,
+                "b": 2.0
+            }
+        },
+        "expected_status": 401,
+        "skip_auth": true,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "subtract_unauthorized",
+        "category": "AUTH",
+        "endpoint": "/subtract",
+        "method": "POST",
+        "description": "Attempt to subtract without authentication, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 5.0,
+                "b": 2.0
+            }
+        },
+        "expected_status": 401,
+        "skip_auth": true,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "multiply_unauthorized",
+        "category": "AUTH",
+        "endpoint": "/multiply",
+        "method": "POST",
+        "description": "Attempt to multiply without authentication, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 3.0,
+                "b": 4.0
+            }
+        },
+        "expected_status": 401,
+        "skip_auth": true,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "divide_unauthorized",
+        "category": "AUTH",
+        "endpoint": "/divide",
+        "method": "POST",
+        "description": "Attempt to divide without authentication, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 10.0,
+                "b": 2.0
+            }
+        },
+        "expected_status": 401,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     },
@@ -330,24 +443,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             }
         },
         "expected_status": 401,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "list_calculations_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations",
-        "method": "GET",
-        "description": "List all stored calculations, expect 200 with an array response",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
-        },
-        "expected_status": 200,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     },
@@ -363,67 +459,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": null
         },
         "expected_status": 401,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "get_calculation_by_id_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "GET",
-        "description": "Create a calculation, then retrieve it by ID, then delete it",
-        "setup": {
-            "endpoint": "/calculations",
-            "method": "POST",
-            "body": {
-                "operation": "add",
-                "a": 15.0,
-                "b": 25.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "extract_id_from": "id"
-        },
-        "request_data": {
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
-        },
-        "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/calculations/{calculation_id}",
-            "method": "DELETE",
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
-        }
-    },
-    {
-        "name": "get_calculation_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "GET",
-        "description": "Attempt to retrieve a non-existent calculation, expect 404",
-        "request_data": {
-            "path": {
-                "calculation_id": 999999
-            },
-            "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
-        },
-        "expected_status": 404,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     },
@@ -441,58 +477,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": null
         },
         "expected_status": 401,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "delete_calculation_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "DELETE",
-        "description": "Create a calculation, then delete it and verify 204 response",
-        "setup": {
-            "endpoint": "/calculations",
-            "method": "POST",
-            "body": {
-                "operation": "sub",
-                "a": 100.0,
-                "b": 50.0
-            },
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "extract_id_from": "id"
-        },
-        "request_data": {
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
-        },
-        "expected_status": 204,
-        "cleanup": null
-    },
-    {
-        "name": "delete_calculation_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "DELETE",
-        "description": "Attempt to delete a non-existent calculation, expect 404",
-        "request_data": {
-            "path": {
-                "calculation_id": 999999
-            },
-            "query": {},
-            "body": null,
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            }
-        },
-        "expected_status": 404,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     },
@@ -510,6 +495,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "body": null
         },
         "expected_status": 401,
+        "skip_auth": true,
         "setup": null,
         "cleanup": null
     }
