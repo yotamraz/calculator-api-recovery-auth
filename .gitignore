@@ -86,6 +86,7 @@ replay_pid*
 *.out
 *.coverprofile
 calculator.db
+calculator-api
 
 # ----- C# / .NET -----
 [Bb]in/
