@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-24T14:05:00.734152+00:00
+Generated at: 2026-02-24T14:10:07.006797+00:00
 Project: calculator-api-recovery-auth
 Milestone: 1
 """
@@ -88,7 +88,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/auth/register",
         "method": "POST",
-        "description": "Attempt to register with a username that already exists, expect 400 with detail message",
+        "description": "Attempt to register with a username that already exists, expect 400",
         "setup": {
             "endpoint": "/auth/register",
             "method": "POST",
@@ -113,7 +113,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "MISSING_REQUIRED",
         "endpoint": "/auth/register",
         "method": "POST",
-        "description": "Attempt to register without providing a password field, expect 4xx validation error",
+        "description": "Attempt to register without providing a password field, expect 422 validation error",
         "request_data": {
             "path": {},
             "query": {},
@@ -130,7 +130,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "AUTH",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Register a user then login with valid credentials via form-encoded body, expect 200 with access_token and token_type",
+        "description": "Register a user then login with valid credentials via form-encoded body, expect 200 with access_token",
         "setup": {
             "endpoint": "/auth/register",
             "method": "POST",
@@ -191,6 +191,319 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "password": "${AUTH_PASSWORD}"
             },
             "content_type": "application/x-www-form-urlencoded"
+        },
+        "expected_status": 401,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "add_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/add",
+        "method": "POST",
+        "description": "Add two numbers with valid JWT, expect 200 with correct result",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 10,
+                "b": 5
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "subtract_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/subtract",
+        "method": "POST",
+        "description": "Subtract two numbers with valid JWT, expect 200 with correct result",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 10,
+                "b": 3
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "multiply_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/multiply",
+        "method": "POST",
+        "description": "Multiply two numbers with valid JWT, expect 200 with correct result",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 4,
+                "b": 7
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "divide_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/divide",
+        "method": "POST",
+        "description": "Divide two numbers with valid JWT, expect 200 with correct result",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 20,
+                "b": 4
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "divide_by_zero",
+        "category": "INVALID_INPUT",
+        "endpoint": "/divide",
+        "method": "POST",
+        "description": "Divide by zero with valid JWT, expect 400 with error message",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 10,
+                "b": 0
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 400,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "add_no_auth",
+        "category": "AUTH",
+        "endpoint": "/add",
+        "method": "POST",
+        "description": "Attempt to add without JWT token, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 1,
+                "b": 2
+            }
+        },
+        "expected_status": 401,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "create_calculation_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations",
+        "method": "POST",
+        "description": "Create a new calculation record with valid JWT, expect 201",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "operation": "add",
+                "a": 3,
+                "b": 7
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 201,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "create_calculation_unknown_operation",
+        "category": "INVALID_INPUT",
+        "endpoint": "/calculations",
+        "method": "POST",
+        "description": "Create calculation with unknown operation, expect 400",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "operation": "modulo",
+                "a": 10,
+                "b": 3
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 400,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "list_calculations_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations",
+        "method": "GET",
+        "description": "List all calculations with valid JWT, expect 200 with array",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": null,
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "get_calculation_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "GET",
+        "description": "Get a specific calculation by ID with valid JWT, expect 200",
+        "setup": {
+            "endpoint": "/calculations",
+            "method": "POST",
+            "body": {
+                "operation": "mul",
+                "a": 6,
+                "b": 7
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "extract_id_from": "id"
+        },
+        "request_data": {
+            "path": {
+                "calculation_id": "$setup_id"
+            },
+            "query": {},
+            "body": null,
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 200,
+        "cleanup": {
+            "endpoint": "/calculations/{calculation_id}",
+            "method": "DELETE",
+            "path": {
+                "calculation_id": "$setup_id"
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        }
+    },
+    {
+        "name": "get_calculation_not_found",
+        "category": "NOT_FOUND",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "GET",
+        "description": "Get a calculation that does not exist, expect 404",
+        "request_data": {
+            "path": {
+                "calculation_id": 999999
+            },
+            "query": {},
+            "body": null,
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 404,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "delete_calculation_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "DELETE",
+        "description": "Delete a calculation by ID with valid JWT, expect 204",
+        "setup": {
+            "endpoint": "/calculations",
+            "method": "POST",
+            "body": {
+                "operation": "sub",
+                "a": 20,
+                "b": 5
+            },
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "extract_id_from": "id"
+        },
+        "request_data": {
+            "path": {
+                "calculation_id": "$setup_id"
+            },
+            "query": {},
+            "body": null,
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 204,
+        "cleanup": null
+    },
+    {
+        "name": "delete_calculation_not_found",
+        "category": "NOT_FOUND",
+        "endpoint": "/calculations/{calculation_id}",
+        "method": "DELETE",
+        "description": "Delete a calculation that does not exist, expect 404",
+        "request_data": {
+            "path": {
+                "calculation_id": 999999
+            },
+            "query": {},
+            "body": null,
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            }
+        },
+        "expected_status": 404,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "calculations_no_auth",
+        "category": "AUTH",
+        "endpoint": "/calculations",
+        "method": "GET",
+        "description": "Attempt to list calculations without JWT token, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": null
         },
         "expected_status": 401,
         "setup": null,
