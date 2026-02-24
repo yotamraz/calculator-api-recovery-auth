@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-24T01:07:19.653708+00:00
+Generated at: 2026-02-24T01:13:14.566809+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -146,13 +146,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body_form": {
+            "body": {
                 "username": "testuser_token1",
                 "password": "${AUTH_PASSWORD}"
-            }
+            },
+            "content_type": "application/x-www-form-urlencoded"
         },
         "expected_status": 200,
         "cleanup": null
@@ -175,13 +173,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body_form": {
+            "body": {
                 "username": "testuser_badpw",
                 "password": "completely_wrong_password"
-            }
+            },
+            "content_type": "application/x-www-form-urlencoded"
         },
         "expected_status": 401,
         "cleanup": null
@@ -196,13 +192,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body_form": {
+            "body": {
                 "username": "nonexistent_user_xyz",
                 "password": "${AUTH_PASSWORD}"
-            }
+            },
+            "content_type": "application/x-www-form-urlencoded"
         },
         "expected_status": 401,
         "cleanup": null
