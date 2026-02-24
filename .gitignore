@@ -86,6 +86,9 @@ replay_pid*
 *.out
 *.coverprofile
 
+# ----- SQLite database (project-specific) -----
+calculator.db
+
 # ----- C# / .NET -----
 [Bb]in/
 [Oo]bj/
