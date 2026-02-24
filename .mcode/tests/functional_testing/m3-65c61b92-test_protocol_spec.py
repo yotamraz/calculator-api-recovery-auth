@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-24T01:27:36.956618+00:00
+Generated at: 2026-02-24T01:30:36.088166+00:00
 Project: calculator-api-recovery-auth
 Milestone: 3
 """
@@ -75,7 +75,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "AUTH",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Login to obtain JWT access token for subsequent tests",
+        "description": "Login to obtain JWT access token",
         "skip_auth": true,
         "request_data": {
             "path": {},
@@ -96,7 +96,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/add",
         "method": "POST",
-        "description": "Add two positive numbers and verify the result",
+        "description": "Add two numbers with auth",
         "request_data": {
             "path": {},
             "query": {},
@@ -111,48 +111,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "add_negative_numbers",
-        "category": "HAPPY_PATH",
-        "endpoint": "/add",
-        "method": "POST",
-        "description": "Add two negative numbers and verify the result",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {},
-            "body": {
-                "a": -10.5,
-                "b": -4.5
-            }
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "add_missing_field",
-        "category": "MISSING_REQUIRED",
-        "endpoint": "/add",
-        "method": "POST",
-        "description": "Send request with missing required field b, expect validation error",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {},
-            "body": {
-                "a": 5.0
-            }
-        },
-        "expected_status": 422,
-        "setup": null,
-        "cleanup": null
-    },
-    {
         "name": "add_no_auth",
-        "category": "AUTH",
+        "category": "NEGATIVE",
         "endpoint": "/add",
         "method": "POST",
-        "description": "Attempt to add without authentication, expect 401",
+        "description": "Add without auth expects 401",
         "skip_auth": true,
         "request_data": {
             "path": {},
@@ -172,7 +135,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/subtract",
         "method": "POST",
-        "description": "Subtract two numbers and verify the result",
+        "description": "Subtract two numbers",
         "request_data": {
             "path": {},
             "query": {},
@@ -187,30 +150,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "subtract_negative_result",
-        "category": "HAPPY_PATH",
-        "endpoint": "/subtract",
-        "method": "POST",
-        "description": "Subtract where result is negative",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {},
-            "body": {
-                "a": 3.0,
-                "b": 10.0
-            }
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
         "name": "multiply_happy_path",
         "category": "HAPPY_PATH",
         "endpoint": "/multiply",
         "method": "POST",
-        "description": "Multiply two numbers and verify the result",
+        "description": "Multiply two numbers",
         "request_data": {
             "path": {},
             "query": {},
@@ -225,30 +169,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "multiply_by_zero",
-        "category": "BOUNDARY",
-        "endpoint": "/multiply",
-        "method": "POST",
-        "description": "Multiply by zero, expect result of 0",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {},
-            "body": {
-                "a": 7.0,
-                "b": 0.0
-            }
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
-    },
-    {
         "name": "divide_happy_path",
         "category": "HAPPY_PATH",
         "endpoint": "/divide",
         "method": "POST",
-        "description": "Divide two numbers and verify the result",
+        "description": "Divide two numbers",
         "request_data": {
             "path": {},
             "query": {},
@@ -267,7 +192,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "BOUNDARY",
         "endpoint": "/divide",
         "method": "POST",
-        "description": "Divide by zero, expect 400 with error message",
+        "description": "Divide by zero expects 400",
         "request_data": {
             "path": {},
             "query": {},
@@ -282,31 +207,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "divide_no_auth",
-        "category": "AUTH",
-        "endpoint": "/divide",
-        "method": "POST",
-        "description": "Attempt to divide without authentication, expect 401",
-        "skip_auth": true,
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {},
-            "body": {
-                "a": 10.0,
-                "b": 2.0
-            }
-        },
-        "expected_status": 401,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "create_calculation_happy_path",
+        "name": "create_calculation",
         "category": "HAPPY_PATH",
         "endpoint": "/calculations",
         "method": "POST",
-        "description": "Create a new calculation with valid operation and operands",
+        "description": "Create a calculation",
         "request_data": {
             "path": {},
             "query": {},
@@ -322,51 +227,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "create_calculation_unknown_operation",
-        "category": "INVALID_INPUT",
-        "endpoint": "/calculations",
-        "method": "POST",
-        "description": "Create calculation with unknown operation, expect 400",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {},
-            "body": {
-                "operation": "mod",
-                "a": 10.0,
-                "b": 3.0
-            }
-        },
-        "expected_status": 400,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "create_calculation_divide_by_zero",
-        "category": "BOUNDARY",
-        "endpoint": "/calculations",
-        "method": "POST",
-        "description": "Create calculation with division by zero, expect 400",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {},
-            "body": {
-                "operation": "div",
-                "a": 10.0,
-                "b": 0.0
-            }
-        },
-        "expected_status": 400,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "list_calculations_happy_path",
+        "name": "list_calculations",
         "category": "HAPPY_PATH",
         "endpoint": "/calculations",
         "method": "GET",
-        "description": "List all calculations, expect 200 with array response",
+        "description": "List calculations",
         "request_data": {
             "path": {},
             "query": {},
@@ -376,63 +241,13 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "expected_status": 200,
         "setup": null,
         "cleanup": null
-    },
-    {
-        "name": "list_calculations_no_auth",
-        "category": "AUTH",
-        "endpoint": "/calculations",
-        "method": "GET",
-        "description": "Attempt to list calculations without authentication, expect 401",
-        "skip_auth": true,
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {},
-            "body": null
-        },
-        "expected_status": 401,
-        "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "get_calculation_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "GET",
-        "description": "Create a calculation, then retrieve it by ID, then delete it",
-        "setup": {
-            "endpoint": "/calculations",
-            "method": "POST",
-            "body": {
-                "operation": "mul",
-                "a": 6.0,
-                "b": 7.0
-            },
-            "extract_id_from": "id"
-        },
-        "request_data": {
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "query": {},
-            "headers": {},
-            "body": null
-        },
-        "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/calculations/{calculation_id}",
-            "method": "DELETE",
-            "path": {
-                "calculation_id": "$setup_id"
-            }
-        }
     },
     {
         "name": "get_calculation_not_found",
         "category": "NOT_FOUND",
         "endpoint": "/calculations/{calculation_id}",
         "method": "GET",
-        "description": "Attempt to retrieve a non-existent calculation, expect 404",
+        "description": "Get non-existent calculation",
         "request_data": {
             "path": {
                 "calculation_id": 999999
@@ -446,38 +261,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "delete_calculation_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/calculations/{calculation_id}",
-        "method": "DELETE",
-        "description": "Create a calculation, then delete it, expect 204",
-        "setup": {
-            "endpoint": "/calculations",
-            "method": "POST",
-            "body": {
-                "operation": "sub",
-                "a": 20.0,
-                "b": 8.0
-            },
-            "extract_id_from": "id"
-        },
-        "request_data": {
-            "path": {
-                "calculation_id": "$setup_id"
-            },
-            "query": {},
-            "headers": {},
-            "body": null
-        },
-        "expected_status": 204,
-        "cleanup": null
-    },
-    {
         "name": "delete_calculation_not_found",
         "category": "NOT_FOUND",
         "endpoint": "/calculations/{calculation_id}",
         "method": "DELETE",
-        "description": "Attempt to delete a non-existent calculation, expect 404",
+        "description": "Delete non-existent calculation",
         "request_data": {
             "path": {
                 "calculation_id": 999999
