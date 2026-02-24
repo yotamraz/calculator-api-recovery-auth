@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-24T14:06:10.201802+00:00
+Generated at: 2026-02-24T14:10:12.424918+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -50,6 +50,101 @@ def resolve_env_placeholders(obj: Any) -> Any:
 # that the agent may have substituted for detected secrets.
 TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     json.loads(r'''[
+    {
+        "name": "health_check",
+        "category": "HAPPY_PATH",
+        "endpoint": "/health",
+        "method": "GET",
+        "description": "Health check returns status ok and version",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": null
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "register_user",
+        "category": "HAPPY_PATH",
+        "endpoint": "/auth/register",
+        "method": "POST",
+        "description": "Register a new user and verify 201 response",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {},
+            "body": {
+                "username": "registertest",
+                "password": "pass1234"
+            }
+        },
+        "expected_status": 201,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "register_duplicate_user",
+        "category": "INVALID_INPUT",
+        "endpoint": "/auth/register",
+        "method": "POST",
+        "description": "Attempt to register a duplicate username, expect 400",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {},
+            "body": {
+                "username": "testuser",
+                "password": "testpass123"
+            }
+        },
+        "expected_status": 400,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "login_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/auth/token",
+        "method": "POST",
+        "description": "Login with valid credentials and get JWT token",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            "body": {
+                "username": "testuser",
+                "password": "testpass123"
+            }
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "login_invalid_credentials",
+        "category": "AUTH",
+        "endpoint": "/auth/token",
+        "method": "POST",
+        "description": "Login with invalid credentials, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            "body": {
+                "username": "nonexistent",
+                "password": "wrongpass"
+            }
+        },
+        "expected_status": 401,
+        "setup": null,
+        "cleanup": null
+    },
     {
         "name": "add_happy_path",
         "category": "HAPPY_PATH",
