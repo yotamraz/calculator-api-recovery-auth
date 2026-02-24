@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-24T14:11:26.026744+00:00
+Generated at: 2026-02-24T14:15:54.209118+00:00
 Project: calculator-api-recovery-auth
 Milestone: 1
 """
