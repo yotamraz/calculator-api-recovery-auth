@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-24T16:32:01.897332+00:00
+Generated at: 2026-02-24T17:13:59.693944+00:00
 Project: calculator-api-auth
 Milestone: 3
 """
@@ -51,21 +51,30 @@ def resolve_env_placeholders(obj: Any) -> Any:
 TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     json.loads(r'''[
     {
+        "name": "register_user",
+        "category": "SETUP",
+        "endpoint": "/auth/register",
+        "method": "POST",
+        "description": "Register a test user for authentication. May return 400 if user already exists from a previous run.",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "username": "testuser",
+                "password": "secret123"
+            }
+        },
+        "expected_status": 201,
+        "skip_auth": true,
+        "setup": null,
+        "cleanup": null
+    },
+    {
         "name": "login_user",
         "category": "AUTH",
         "endpoint": "/auth/token",
         "method": "POST",
-        "description": "Register a test user then login to obtain a JWT access token for subsequent tests",
-        "setup": {
-            "endpoint": "/auth/register",
-            "method": "POST",
-            "body": {
-                "username": "testuser",
-                "password": "secret123"
-            },
-            "extract_id_from": "id",
-            "required": false
-        },
+        "description": "Login to obtain a JWT access token for subsequent tests",
         "request_data": {
             "path": {},
             "query": {},
@@ -77,6 +86,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         },
         "expected_status": 200,
         "skip_auth": true,
+        "setup": null,
         "cleanup": null
     },
     {
@@ -174,7 +184,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "BOUNDARY",
         "endpoint": "/divide",
         "method": "POST",
-        "description": "Divide by zero and verify 400 error with 'Cannot divide by zero' message",
+        "description": "Divide by zero and verify 400 error",
         "request_data": {
             "path": {},
             "query": {},
@@ -192,7 +202,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/calculations",
         "method": "POST",
-        "description": "Create a stored calculation using 'mul' operation and verify 201 response with all fields",
+        "description": "Create a stored calculation using 'mul' operation",
         "request_data": {
             "path": {},
             "query": {},
@@ -230,7 +240,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "BOUNDARY",
         "endpoint": "/calculations",
         "method": "POST",
-        "description": "Create a calculation with div operation and b=0, expect 400 for divide by zero",
+        "description": "Create a calculation with div operation and b=0, expect 400",
         "request_data": {
             "path": {},
             "query": {},
