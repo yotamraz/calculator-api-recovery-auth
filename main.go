@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -11,6 +13,10 @@ import (
 // (e.g., JWT auth) added in later milestones.
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
+	r.HandleMethodNotAllowed = true
+	r.NoMethod(func(c *gin.Context) {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"detail": "Method Not Allowed"})
+	})
 
 	// Public routes (no authentication required)
 	r.GET("/health", HealthCheck)
