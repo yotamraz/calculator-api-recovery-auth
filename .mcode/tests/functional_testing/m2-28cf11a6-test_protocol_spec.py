@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-28T22:23:29.345868+00:00
+Generated at: 2026-02-28T22:26:24.768065+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -146,13 +146,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body_form": {
+            "body": {
                 "username": "token_user",
                 "password": "${AUTH_PASSWORD}"
-            }
+            },
+            "content_type": "form"
         },
         "expected_status": 200,
         "cleanup": null
@@ -175,13 +173,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body_form": {
+            "body": {
                 "username": "wrong_pass_user",
                 "password": "completely_wrong_password"
-            }
+            },
+            "content_type": "form"
         },
         "expected_status": 401,
         "cleanup": null
@@ -195,13 +191,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body_form": {
+            "body": {
                 "username": "nonexistent_user_xyz",
                 "password": "${AUTH_PASSWORD}"
-            }
+            },
+            "content_type": "form"
         },
         "expected_status": 401,
         "setup": null,
