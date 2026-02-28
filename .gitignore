@@ -85,6 +85,13 @@ replay_pid*
 *.test
 *.out
 *.coverprofile
+calculator-api
+
+# ----- SQLite -----
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
 
 # ----- C# / .NET -----
 [Bb]in/
