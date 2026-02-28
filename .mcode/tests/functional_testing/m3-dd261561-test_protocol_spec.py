@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-28T22:31:25.222101+00:00
+Generated at: 2026-02-28T22:33:39.722295+00:00
 Project: calculator-api-recovery-auth
 Milestone: 3
 """
@@ -95,6 +95,24 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
+        "name": "add_unauthorized",
+        "category": "AUTH",
+        "endpoint": "/add",
+        "method": "POST",
+        "description": "Attempt to add without auth token, expect 401",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": {
+                "a": 1,
+                "b": 2
+            }
+        },
+        "expected_status": 401,
+        "setup": null,
+        "cleanup": null
+    },
+    {
         "name": "login_happy_path",
         "category": "AUTH",
         "endpoint": "/auth/token",
@@ -137,24 +155,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "content_type": "application/x-www-form-urlencoded"
         },
         "expected_status": 401,
-        "cleanup": null
-    },
-    {
-        "name": "add_unauthorized",
-        "category": "AUTH",
-        "endpoint": "/add",
-        "method": "POST",
-        "description": "Attempt to add without auth token, expect 401",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "a": 1,
-                "b": 2
-            }
-        },
-        "expected_status": 401,
-        "setup": null,
         "cleanup": null
     },
     {
