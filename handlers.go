@@ -2,10 +2,41 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
+
+// ValidationErrorDetail represents a single validation error in FastAPI format.
+type ValidationErrorDetail struct {
+	Loc  []string `json:"loc"`
+	Msg  string   `json:"msg"`
+	Type string   `json:"type"`
+}
+
+// formatValidationErrors converts Gin/validator errors into FastAPI-style validation error array.
+func formatValidationErrors(err error) []ValidationErrorDetail {
+	var details []ValidationErrorDetail
+	if ve, ok := err.(validator.ValidationErrors); ok {
+		for _, fe := range ve {
+			fieldName := strings.ToLower(fe.Field())
+			details = append(details, ValidationErrorDetail{
+				Loc:  []string{"body", fieldName},
+				Msg:  "field required",
+				Type: "value_error.missing",
+			})
+		}
+	} else {
+		details = append(details, ValidationErrorDetail{
+			Loc:  []string{"body"},
+			Msg:  err.Error(),
+			Type: "value_error",
+		})
+	}
+	return details
+}
 
 // HealthCheck returns the health status of the service.
 // GET /health
@@ -22,7 +53,7 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": err.Error()})
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": formatValidationErrors(err)})
 			return
 		}
 
@@ -59,13 +90,29 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// TokenRequest is the request body for the token endpoint.
+// Supports both form-encoded and JSON formats.
+type TokenRequest struct {
+	Username string `form:"username" json:"username"`
+	Password string `form:"password" json:"password"`
+}
+
 // TokenHandler handles token issuance via OAuth2 password flow.
 // POST /auth/token
-// Accepts application/x-www-form-urlencoded with fields: username, password
+// Accepts application/x-www-form-urlencoded or JSON with fields: username, password
 func TokenHandler(db *gorm.DB, cfg Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		username := c.PostForm("username")
-		password := c.PostForm("password")
+		var req TokenRequest
+		if err := c.ShouldBind(&req); err != nil {
+			c.Header("WWW-Authenticate", "Bearer")
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"detail": "Incorrect username or password",
+			})
+			return
+		}
+
+		username := req.Username
+		password := req.Password
 
 		if username == "" || password == "" {
 			c.Header("WWW-Authenticate", "Bearer")
