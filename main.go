@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -47,6 +48,12 @@ func SetupRouter(db *gorm.DB, cfg Config) *gin.Engine {
 
 func main() {
 	cfg := LoadConfig()
+
+	// Remove stale database file to ensure a fresh start
+	if cfg.DatabaseURL != ":memory:" {
+		os.Remove(cfg.DatabaseURL)
+	}
+
 	db := InitDB(cfg.DatabaseURL)
 
 	r := SetupRouter(db, cfg)
