@@ -8,10 +8,9 @@ import (
 )
 
 // SetupRouter creates and configures a Gin engine with all routes.
-// It accepts a *gorm.DB so that handlers and middleware can access the database.
-// The router is structured with route groups to anticipate future middleware
-// (e.g., JWT auth) added in later milestones.
-func SetupRouter(db *gorm.DB) *gin.Engine {
+// It accepts a *gorm.DB and Config so that handlers and middleware can
+// access the database and configuration.
+func SetupRouter(db *gorm.DB, cfg Config) *gin.Engine {
 	r := gin.Default()
 	r.HandleMethodNotAllowed = true
 	r.NoMethod(func(c *gin.Context) {
@@ -21,23 +20,27 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// Public routes (no authentication required)
 	r.GET("/health", HealthCheck)
 
-	// Future public auth routes will go here:
-	// r.POST("/auth/register", ...)
-	// r.POST("/auth/token", ...)
+	// Auth routes (public)
+	r.POST("/auth/register", RegisterHandler(db))
+	r.POST("/auth/token", TokenHandler(db, cfg))
 
-	// Protected routes (authentication middleware will be added in a later milestone)
-	// protected := r.Group("/")
-	// protected.Use(AuthMiddleware(db))
-	// {
-	//   protected.POST("/add", ...)
-	//   protected.POST("/subtract", ...)
-	//   protected.POST("/multiply", ...)
-	//   protected.POST("/divide", ...)
-	//   protected.POST("/calculations", ...)
-	//   protected.GET("/calculations", ...)
-	//   protected.GET("/calculations/:id", ...)
-	//   protected.DELETE("/calculations/:id", ...)
-	// }
+	// Protected routes (authentication middleware applied)
+	// Calculator and CRUD endpoints will be added in Milestone 3.
+	protected := r.Group("/")
+	protected.Use(AuthMiddleware(db, cfg.JWTSecretKey))
+	{
+		// Calculator endpoints (to be implemented in Milestone 3)
+		// protected.POST("/add", ...)
+		// protected.POST("/subtract", ...)
+		// protected.POST("/multiply", ...)
+		// protected.POST("/divide", ...)
+
+		// Calculation CRUD endpoints (to be implemented in Milestone 3)
+		// protected.POST("/calculations", ...)
+		// protected.GET("/calculations", ...)
+		// protected.GET("/calculations/:id", ...)
+		// protected.DELETE("/calculations/:id", ...)
+	}
 
 	return r
 }
@@ -46,9 +49,6 @@ func main() {
 	cfg := LoadConfig()
 	db := InitDB(cfg.DatabaseURL)
 
-	// Store config in a package-level variable for access by auth module (future milestones)
-	_ = db
-
-	r := SetupRouter(db)
+	r := SetupRouter(db, cfg)
 	r.Run(":8000")
 }
