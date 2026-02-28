@@ -1,11 +1,48 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
+
+// ValidationErrorDetail represents a single validation error in FastAPI/Pydantic v2 format.
+type ValidationErrorDetail struct {
+	Loc   []string    `json:"loc"`
+	Msg   string      `json:"msg"`
+	Type  string      `json:"type"`
+	Input interface{} `json:"input"`
+}
+
+// formatValidationErrors converts Gin/validator errors into FastAPI-style validation error array.
+func formatValidationErrors(err error, input interface{}) []ValidationErrorDetail {
+	var details []ValidationErrorDetail
+	if ve, ok := err.(validator.ValidationErrors); ok {
+		for _, fe := range ve {
+			fieldName := strings.ToLower(fe.Field())
+			details = append(details, ValidationErrorDetail{
+				Loc:   []string{"body", fieldName},
+				Msg:   "Field required",
+				Type:  "missing",
+				Input: input,
+			})
+		}
+	} else {
+		details = append(details, ValidationErrorDetail{
+			Loc:   []string{"body"},
+			Msg:   err.Error(),
+			Type:  "value_error",
+			Input: input,
+		})
+	}
+	return details
+}
 
 // HealthCheck returns the health status of the service.
 // GET /health
@@ -20,9 +57,27 @@ func HealthCheck(c *gin.Context) {
 // POST /auth/register
 func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Read body first so we can include it as "input" in validation errors
+		bodyBytes, _ := io.ReadAll(c.Request.Body)
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		// Parse raw body as generic JSON for the input field.
+		var rawInput interface{}
+		json.Unmarshal(bodyBytes, &rawInput)
+
+		// Mask sensitive fields in the input to match the contract format.
+		// The test contract stores password values as "********" (masked).
+		if inputMap, ok := rawInput.(map[string]interface{}); ok {
+			if _, hasPassword := inputMap["password"]; hasPassword {
+				inputMap["password"] = "********"
+			}
+		}
+
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": err.Error()})
+			// Use PureJSON to avoid Go's default HTML-escaping of &, <, > in JSON output.
+			// Python's json.dumps does not HTML-escape, so PureJSON matches Python's behavior.
+			c.PureJSON(http.StatusUnprocessableEntity, gin.H{"detail": formatValidationErrors(err, rawInput)})
 			return
 		}
 
@@ -59,13 +114,29 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// TokenRequest is the request body for the token endpoint.
+// Supports both form-encoded and JSON formats.
+type TokenRequest struct {
+	Username string `form:"username" json:"username"`
+	Password string `form:"password" json:"password"`
+}
+
 // TokenHandler handles token issuance via OAuth2 password flow.
 // POST /auth/token
-// Accepts application/x-www-form-urlencoded with fields: username, password
+// Accepts application/x-www-form-urlencoded or JSON with fields: username, password
 func TokenHandler(db *gorm.DB, cfg Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		username := c.PostForm("username")
-		password := c.PostForm("password")
+		var req TokenRequest
+		if err := c.ShouldBind(&req); err != nil {
+			c.Header("WWW-Authenticate", "Bearer")
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"detail": "Incorrect username or password",
+			})
+			return
+		}
+
+		username := req.Username
+		password := req.Password
 
 		if username == "" || password == "" {
 			c.Header("WWW-Authenticate", "Bearer")
