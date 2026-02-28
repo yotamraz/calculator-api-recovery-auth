@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-02-28T22:50:23.912576+00:00
+Generated at: 2026-02-28T22:53:20.086617+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -144,10 +144,10 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body": "username=login_user&password=${AUTH_PASSWORD}"
+            "form_data": {
+                "username": "login_user",
+                "password": "${AUTH_PASSWORD}"
+            }
         },
         "expected_status": 200,
         "cleanup": null
@@ -169,10 +169,10 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body": "username=wrongpw_user&password=completely_wrong_password"
+            "form_data": {
+                "username": "wrongpw_user",
+                "password": "completely_wrong_password"
+            }
         },
         "expected_status": 401,
         "cleanup": null
@@ -186,10 +186,10 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body": "username=nonexistent_user_xyz&password=any_password"
+            "form_data": {
+                "username": "nonexistent_user_xyz",
+                "password": "any_password"
+            }
         },
         "expected_status": 401,
         "cleanup": null
