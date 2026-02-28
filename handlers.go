@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
 	"strings"
 
@@ -9,30 +12,33 @@ import (
 	"gorm.io/gorm"
 )
 
-// ValidationErrorDetail represents a single validation error in FastAPI format.
+// ValidationErrorDetail represents a single validation error in FastAPI/Pydantic v2 format.
 type ValidationErrorDetail struct {
-	Loc  []string `json:"loc"`
-	Msg  string   `json:"msg"`
-	Type string   `json:"type"`
+	Loc   []string    `json:"loc"`
+	Msg   string      `json:"msg"`
+	Type  string      `json:"type"`
+	Input interface{} `json:"input"`
 }
 
 // formatValidationErrors converts Gin/validator errors into FastAPI-style validation error array.
-func formatValidationErrors(err error) []ValidationErrorDetail {
+func formatValidationErrors(err error, input interface{}) []ValidationErrorDetail {
 	var details []ValidationErrorDetail
 	if ve, ok := err.(validator.ValidationErrors); ok {
 		for _, fe := range ve {
 			fieldName := strings.ToLower(fe.Field())
 			details = append(details, ValidationErrorDetail{
-				Loc:  []string{"body", fieldName},
-				Msg:  "field required",
-				Type: "value_error.missing",
+				Loc:   []string{"body", fieldName},
+				Msg:   "Field required",
+				Type:  "missing",
+				Input: input,
 			})
 		}
 	} else {
 		details = append(details, ValidationErrorDetail{
-			Loc:  []string{"body"},
-			Msg:  err.Error(),
-			Type: "value_error",
+			Loc:   []string{"body"},
+			Msg:   err.Error(),
+			Type:  "value_error",
+			Input: input,
 		})
 	}
 	return details
@@ -51,9 +57,17 @@ func HealthCheck(c *gin.Context) {
 // POST /auth/register
 func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Read body first so we can include it as "input" in validation errors
+		bodyBytes, _ := io.ReadAll(c.Request.Body)
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		// Parse raw body as generic JSON for the input field
+		var rawInput interface{}
+		json.Unmarshal(bodyBytes, &rawInput)
+
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": formatValidationErrors(err)})
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": formatValidationErrors(err, rawInput)})
 			return
 		}
 
