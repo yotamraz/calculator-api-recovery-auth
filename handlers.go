@@ -61,13 +61,19 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 		bodyBytes, _ := io.ReadAll(c.Request.Body)
 		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
-		// Parse raw body as generic JSON for the input field
+		// Parse raw body as generic JSON for the input field.
+		// Use json.Decoder with UseNumber() to preserve exact number formatting
+		// (e.g., "1.0" stays as "1.0" instead of being converted to float64 and back to "1").
 		var rawInput interface{}
-		json.Unmarshal(bodyBytes, &rawInput)
+		dec := json.NewDecoder(bytes.NewReader(bodyBytes))
+		dec.UseNumber()
+		dec.Decode(&rawInput)
 
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": formatValidationErrors(err, rawInput)})
+			// Use PureJSON to avoid Go's default HTML-escaping of &, <, > in JSON output.
+			// Python's json.dumps does not HTML-escape, so PureJSON matches Python's behavior.
+			c.PureJSON(http.StatusUnprocessableEntity, gin.H{"detail": formatValidationErrors(err, rawInput)})
 			return
 		}
 
