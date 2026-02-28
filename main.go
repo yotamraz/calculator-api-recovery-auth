@@ -11,6 +11,7 @@ import (
 // (e.g., JWT auth) added in later milestones.
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
+	r.HandleMethodNotAllowed = true
 
 	// Public routes (no authentication required)
 	r.GET("/health", HealthCheck)
