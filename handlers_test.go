@@ -53,3 +53,27 @@ func TestHealthCheckContentType(t *testing.T) {
 		t.Errorf("GET /health Content-Type = %q, want %q", contentType, "application/json; charset=utf-8")
 	}
 }
+
+func TestHealthCheckMethodNotAllowed(t *testing.T) {
+	router := setupTestRouter()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/health", nil)
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusMethodNotAllowed {
+		t.Errorf("POST /health status = %d, want %d", w.Code, http.StatusMethodNotAllowed)
+	}
+}
+
+func TestNotFoundRoute(t *testing.T) {
+	router := setupTestRouter()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/nonexistent", nil)
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNotFound {
+		t.Errorf("GET /nonexistent status = %d, want %d", w.Code, http.StatusNotFound)
+	}
+}
