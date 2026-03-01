@@ -534,8 +534,8 @@ func TestCalculatorEndpointUnauthenticated(t *testing.T) {
 
 		var resp map[string]string
 		json.Unmarshal(w.Body.Bytes(), &resp)
-		if resp["detail"] != "Could not validate credentials" {
-			t.Errorf("POST %s unauthenticated detail = %q, want %q", ep, resp["detail"], "Could not validate credentials")
+		if resp["detail"] != "Not authenticated" {
+			t.Errorf("POST %s unauthenticated detail = %q, want %q", ep, resp["detail"], "Not authenticated")
 		}
 	}
 }

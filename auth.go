@@ -146,11 +146,13 @@ func AuthMiddleware(db *gorm.DB, cfg Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		credentialsError := "Could not validate credentials"
 
-		// Extract the Authorization header
+		// Extract the Authorization header.
+		// FastAPI's OAuth2PasswordBearer returns "Not authenticated" when no
+		// Authorization header is present at all, so we mirror that behaviour.
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.Header("WWW-Authenticate", "Bearer")
-			abortWithDetail(c, http.StatusUnauthorized, credentialsError)
+			abortWithDetail(c, http.StatusUnauthorized, "Not authenticated")
 			return
 		}
 

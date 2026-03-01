@@ -191,8 +191,8 @@ func TestAuthMiddleware_NoToken(t *testing.T) {
 
 	var resp map[string]string
 	json.Unmarshal(w.Body.Bytes(), &resp)
-	if resp["detail"] != "Could not validate credentials" {
-		t.Errorf("Error detail = %q, want %q", resp["detail"], "Could not validate credentials")
+	if resp["detail"] != "Not authenticated" {
+		t.Errorf("Error detail = %q, want %q", resp["detail"], "Not authenticated")
 	}
 
 	wwwAuth := w.Header().Get("WWW-Authenticate")
