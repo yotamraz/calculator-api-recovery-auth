@@ -28,16 +28,17 @@ func SetupRouter(db *gorm.DB, cfg Config) *gin.Engine {
 	protected := r.Group("/")
 	protected.Use(AuthMiddleware(db, cfg))
 	{
-		// Calculator and CRUD endpoints will be wired in Milestone 3:
-		// protected.POST("/add", ...)
-		// protected.POST("/subtract", ...)
-		// protected.POST("/multiply", ...)
-		// protected.POST("/divide", ...)
-		// protected.POST("/calculations", ...)
-		// protected.GET("/calculations", ...)
-		// protected.GET("/calculations/:id", ...)
-		// protected.DELETE("/calculations/:id", ...)
-		_ = protected // avoid unused variable warning until handlers are added
+		// Calculator endpoints
+		protected.POST("/add", AddHandler())
+		protected.POST("/subtract", SubtractHandler())
+		protected.POST("/multiply", MultiplyHandler())
+		protected.POST("/divide", DivideHandler())
+
+		// Calculation CRUD endpoints
+		protected.POST("/calculations", CreateCalculationHandler(db))
+		protected.GET("/calculations", ListCalculationsHandler(db))
+		protected.GET("/calculations/:id", GetCalculationHandler(db))
+		protected.DELETE("/calculations/:id", DeleteCalculationHandler(db))
 	}
 
 	return r
