@@ -7,6 +7,10 @@ import (
 	"gorm.io/gorm"
 )
 
+// AppConfig holds the application configuration, accessible to all handlers
+// and middleware (e.g., JWT auth in future milestones).
+var AppConfig Config
+
 // SetupRouter creates and configures a Gin engine with all routes.
 // It accepts a *gorm.DB so that handlers and middleware can access the database.
 // The router is structured with route groups to anticipate future middleware
@@ -18,36 +22,25 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"detail": "Method Not Allowed"})
 	})
 
+	// Store the database connection in Gin context for handler access.
+	r.Use(func(c *gin.Context) {
+		c.Set("db", db)
+		c.Next()
+	})
+
 	// Public routes (no authentication required)
 	r.GET("/health", HealthCheck)
 
-	// Future public auth routes will go here:
-	// r.POST("/auth/register", ...)
-	// r.POST("/auth/token", ...)
-
-	// Protected routes (authentication middleware will be added in a later milestone)
-	// protected := r.Group("/")
-	// protected.Use(AuthMiddleware(db))
-	// {
-	//   protected.POST("/add", ...)
-	//   protected.POST("/subtract", ...)
-	//   protected.POST("/multiply", ...)
-	//   protected.POST("/divide", ...)
-	//   protected.POST("/calculations", ...)
-	//   protected.GET("/calculations", ...)
-	//   protected.GET("/calculations/:id", ...)
-	//   protected.DELETE("/calculations/:id", ...)
-	// }
+	// Auth routes and protected calculator/CRUD routes will be added in later milestones.
 
 	return r
 }
 
 func main() {
 	cfg := LoadConfig()
-	db := InitDB(cfg.DatabaseURL)
+	AppConfig = cfg
 
-	// Store config in a package-level variable for access by auth module (future milestones)
-	_ = db
+	db := InitDB(cfg.DatabaseURL)
 
 	r := SetupRouter(db)
 	r.Run(":8000")
