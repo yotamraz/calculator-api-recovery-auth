@@ -30,6 +30,13 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 		var rawBody map[string]interface{}
 		json.Unmarshal(bodyBytes, &rawBody)
 
+		// Mask sensitive fields in the raw body for validation error responses
+		if rawBody != nil {
+			if _, hasPassword := rawBody["password"]; hasPassword {
+				rawBody["password"] = "********"
+			}
+		}
+
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
 			abortWithValidationError(c, err, rawBody)
