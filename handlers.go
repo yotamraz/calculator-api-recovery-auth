@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
 	"time"
 
@@ -21,9 +24,22 @@ func HealthCheck(c *gin.Context) {
 // It creates a new user with a hashed password after checking for duplicate usernames.
 func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Read raw body for potential validation error responses
+		bodyBytes, _ := io.ReadAll(c.Request.Body)
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+		var rawBody map[string]interface{}
+		json.Unmarshal(bodyBytes, &rawBody)
+
+		// Mask sensitive fields in the raw body for validation error responses
+		if rawBody != nil {
+			if _, hasPassword := rawBody["password"]; hasPassword {
+				rawBody["password"] = "********"
+			}
+		}
+
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
-			abortWithDetail(c, http.StatusBadRequest, "Invalid request body")
+			abortWithValidationError(c, err, rawBody)
 			return
 		}
 
@@ -71,6 +87,12 @@ func LoginHandler(db *gorm.DB, cfg Config) gin.HandlerFunc {
 		// Extract form fields (application/x-www-form-urlencoded)
 		username := c.PostForm("username")
 		password := c.PostForm("password")
+
+		// Validate required fields (match FastAPI's 422 for missing fields)
+		if username == "" || password == "" {
+			abortWithFormValidationError(c, username, password)
+			return
+		}
 
 		// Authenticate user
 		user := AuthenticateUser(db, username, password)

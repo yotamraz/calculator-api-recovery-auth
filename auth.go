@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -77,6 +78,64 @@ func GetCurrentUser(c *gin.Context) *User {
 // with the shape {"detail": "<message>"}.
 func abortWithDetail(c *gin.Context, status int, message string) {
 	c.AbortWithStatusJSON(status, gin.H{"detail": message})
+}
+
+// validationErrorItem represents a single FastAPI-style validation error.
+type validationErrorItem struct {
+	Loc   []string    `json:"loc"`
+	Msg   string      `json:"msg"`
+	Type  string      `json:"type"`
+	Input interface{} `json:"input"`
+}
+
+// abortWithValidationError produces a FastAPI-compatible 422 response with
+// detail as an array of validation error objects, parsed from Gin binding errors.
+func abortWithValidationError(c *gin.Context, err error, rawBody map[string]interface{}) {
+	var details []validationErrorItem
+
+	if ve, ok := err.(validator.ValidationErrors); ok {
+		for _, fe := range ve {
+			details = append(details, validationErrorItem{
+				Loc:   []string{"body", strings.ToLower(fe.Field())},
+				Msg:   "Field required",
+				Type:  "missing",
+				Input: rawBody,
+			})
+		}
+	} else {
+		// Fallback for non-validation binding errors (e.g. malformed JSON)
+		details = append(details, validationErrorItem{
+			Loc:   []string{"body"},
+			Msg:   "Invalid request body",
+			Type:  "value_error",
+			Input: rawBody,
+		})
+	}
+
+	c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{"detail": details})
+}
+
+// abortWithFormValidationError produces a FastAPI-compatible 422 response for
+// missing form fields (username/password on the token endpoint).
+func abortWithFormValidationError(c *gin.Context, username, password string) {
+	var details []validationErrorItem
+	if username == "" {
+		details = append(details, validationErrorItem{
+			Loc:   []string{"body", "username"},
+			Msg:   "Field required",
+			Type:  "missing",
+			Input: "",
+		})
+	}
+	if password == "" {
+		details = append(details, validationErrorItem{
+			Loc:   []string{"body", "password"},
+			Msg:   "Field required",
+			Type:  "missing",
+			Input: "",
+		})
+	}
+	c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{"detail": details})
 }
 
 // AuthMiddleware returns a Gin middleware that validates JWT bearer tokens
