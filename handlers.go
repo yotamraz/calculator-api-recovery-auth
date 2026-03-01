@@ -25,7 +25,7 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"detail": "Invalid request body"})
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": "Invalid request body"})
 			return
 		}
 
