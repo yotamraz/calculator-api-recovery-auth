@@ -23,7 +23,7 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
-			abortWithDetail(c, http.StatusUnprocessableEntity, "Invalid request body")
+			abortWithValidationError(c, err)
 			return
 		}
 
@@ -74,7 +74,7 @@ func LoginHandler(db *gorm.DB, cfg Config) gin.HandlerFunc {
 
 		// Validate required fields (match FastAPI's 422 for missing fields)
 		if username == "" || password == "" {
-			abortWithDetail(c, http.StatusUnprocessableEntity, "Invalid request body")
+			abortWithFormValidationError(c, username, password)
 			return
 		}
 
