@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-01T09:30:21.860843+00:00
+Generated at: 2026-03-01T09:36:26.642370+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -146,10 +146,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body": "username=testuser_login&password=${AUTH_PASSWORD}"
+            "content_type": "form",
+            "body": {
+                "username": "testuser_login",
+                "password": "${AUTH_PASSWORD}"
+            }
         },
         "expected_status": 200,
         "cleanup": null
@@ -172,10 +173,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body": "username=testuser_badpwd&password=completely_wrong_password"
+            "content_type": "form",
+            "body": {
+                "username": "testuser_badpwd",
+                "password": "completely_wrong_password"
+            }
         },
         "expected_status": 401,
         "cleanup": null
@@ -189,10 +191,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body": "username=nonexistent_user_xyz&password=anypassword"
+            "content_type": "form",
+            "body": {
+                "username": "nonexistent_user_xyz",
+                "password": "anypassword"
+            }
         },
         "expected_status": 401,
         "setup": null,
@@ -207,10 +210,8 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            "body": ""
+            "content_type": "form",
+            "body": {}
         },
         "expected_status": 422,
         "setup": null,
