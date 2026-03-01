@@ -45,6 +45,13 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 			var input interface{}
 			json.Unmarshal(bodyBytes, &input)
 
+			// Mask sensitive fields in input to match FastAPI contract behavior
+			if inputMap, ok := input.(map[string]interface{}); ok {
+				if _, hasPassword := inputMap["password"]; hasPassword {
+					inputMap["password"] = "********"
+				}
+			}
+
 			var ve validator.ValidationErrors
 			if errors.As(err, &ve) {
 				details := make([]gin.H, 0, len(ve))
