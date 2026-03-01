@@ -9,12 +9,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// testConfig returns a Config suitable for testing with known, predictable values.
+func testConfig() Config {
+	return Config{
+		JWTSecretKey:         "test-secret-key",
+		DatabaseURL:          ":memory:",
+		AccessTokenExpireMin: 30,
+	}
+}
+
 // setupTestRouter creates a Gin engine with an in-memory SQLite database
 // for integration testing.
 func setupTestRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
-	db := InitDB(":memory:")
-	return SetupRouter(db)
+	cfg := testConfig()
+	db := InitDB(cfg.DatabaseURL)
+	return SetupRouter(db, cfg)
 }
 
 func TestHealthCheck(t *testing.T) {
