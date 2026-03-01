@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
 	"time"
 
@@ -21,9 +24,15 @@ func HealthCheck(c *gin.Context) {
 // It creates a new user with a hashed password after checking for duplicate usernames.
 func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Read raw body for potential validation error responses
+		bodyBytes, _ := io.ReadAll(c.Request.Body)
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+		var rawBody map[string]interface{}
+		json.Unmarshal(bodyBytes, &rawBody)
+
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
-			abortWithValidationError(c, err)
+			abortWithValidationError(c, err, rawBody)
 			return
 		}
 

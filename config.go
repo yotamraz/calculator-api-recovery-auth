@@ -17,7 +17,7 @@ type Config struct {
 func LoadConfig() Config {
 	cfg := Config{
 		JWTSecretKey:         "dev-secret-key-change-me-in-production",
-		DatabaseURL:          "calculator.db",
+		DatabaseURL:          "file::memory:?cache=shared",
 		AccessTokenExpireMin: 30,
 	}
 
