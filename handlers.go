@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strings"
 
@@ -26,23 +29,38 @@ func HealthCheck(c *gin.Context) {
 // Returns 400 with {"detail": "Username already taken"} if the username exists.
 func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Read raw body so we can include it as "input" in validation errors
+		bodyBytes, readErr := io.ReadAll(c.Request.Body)
+		if readErr != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": []gin.H{
+				{"loc": []string{"body"}, "msg": "Invalid request body", "type": "value_error", "input": nil},
+			}})
+			return
+		}
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
+			// Parse body into a generic value for the "input" field
+			var input interface{}
+			json.Unmarshal(bodyBytes, &input)
+
 			var ve validator.ValidationErrors
 			if errors.As(err, &ve) {
 				details := make([]gin.H, 0, len(ve))
 				for _, fe := range ve {
 					details = append(details, gin.H{
-						"loc":  []string{"body", strings.ToLower(fe.Field())},
-						"msg":  "Field required",
-						"type": "missing",
+						"loc":   []string{"body", strings.ToLower(fe.Field())},
+						"msg":   "Field required",
+						"type":  "missing",
+						"input": input,
 					})
 				}
 				c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": details})
 				return
 			}
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": []gin.H{
-				{"loc": []string{"body"}, "msg": "Invalid request body", "type": "value_error"},
+				{"loc": []string{"body"}, "msg": "Invalid request body", "type": "value_error", "input": input},
 			}})
 			return
 		}
