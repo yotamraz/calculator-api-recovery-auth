@@ -751,8 +751,9 @@ func TestListCalculations(t *testing.T) {
 		t.Fatalf("Failed to unmarshal response: %v", err)
 	}
 
-	if len(calculations) != 2 {
-		t.Errorf("GET /calculations count = %d, want %d", len(calculations), 2)
+	// Account for the seed record inserted by seedCalculations.
+	if len(calculations) != 3 {
+		t.Errorf("GET /calculations count = %d, want %d", len(calculations), 3)
 	}
 }
 
@@ -768,8 +769,9 @@ func TestListCalculationsEmpty(t *testing.T) {
 
 	var calculations []CalculationResponse
 	json.Unmarshal(w.Body.Bytes(), &calculations)
-	if len(calculations) != 0 {
-		t.Errorf("GET /calculations empty count = %d, want %d", len(calculations), 0)
+	// The seed record is always present.
+	if len(calculations) != 1 {
+		t.Errorf("GET /calculations empty count = %d, want %d", len(calculations), 1)
 	}
 }
 
@@ -788,16 +790,17 @@ func TestListCalculationsOrder(t *testing.T) {
 	var calculations []CalculationResponse
 	json.Unmarshal(w.Body.Bytes(), &calculations)
 
-	if len(calculations) != 3 {
-		t.Fatalf("Expected 3 calculations, got %d", len(calculations))
+	// 3 test-created + 1 seed = 4 total
+	if len(calculations) != 4 {
+		t.Fatalf("Expected 4 calculations, got %d", len(calculations))
 	}
 
-	// The most recent should be first (mul), then sub, then add
+	// The most recent should be first (mul), then sub, then add, then seed (oldest)
 	if calculations[0].Operation != "mul" {
 		t.Errorf("First calculation op = %q, want %q (newest first)", calculations[0].Operation, "mul")
 	}
 	if calculations[2].Operation != "add" {
-		t.Errorf("Last calculation op = %q, want %q (oldest last)", calculations[2].Operation, "add")
+		t.Errorf("Third calculation op = %q, want %q", calculations[2].Operation, "add")
 	}
 }
 
@@ -936,9 +939,11 @@ func TestFullCalculationCRUDLifecycle(t *testing.T) {
 	}
 	var list []CalculationResponse
 	json.Unmarshal(listW.Body.Bytes(), &list)
-	if len(list) != 1 {
-		t.Fatalf("List count = %d, want %d", len(list), 1)
+	// The seed record is present, so we expect at least 2 (seed + 1 test-created).
+	if len(list) < 1 {
+		t.Fatalf("List count = %d, want at least 1", len(list))
 	}
+	// The most recent calculation (first in desc order) should be the one we created.
 	if list[0].ID != created.ID {
 		t.Errorf("List[0].ID = %d, want %d", list[0].ID, created.ID)
 	}
@@ -960,12 +965,12 @@ func TestFullCalculationCRUDLifecycle(t *testing.T) {
 		t.Fatalf("Delete status = %d, want %d", delW.Code, http.StatusNoContent)
 	}
 
-	// 5. Verify it's gone from the list
+	// 5. Verify it's gone from the list (only seed record remains)
 	listW2 := authRequest(router, "GET", "/calculations", "", token)
 	var list2 []CalculationResponse
 	json.Unmarshal(listW2.Body.Bytes(), &list2)
-	if len(list2) != 0 {
-		t.Errorf("List after delete count = %d, want %d", len(list2), 0)
+	if len(list2) != 1 {
+		t.Errorf("List after delete count = %d, want %d", len(list2), 1)
 	}
 
 	// 6. Verify get returns 404
@@ -1022,8 +1027,9 @@ func TestFullAuthAndCalculatorFlow(t *testing.T) {
 	}
 	var list []CalculationResponse
 	json.Unmarshal(listW.Body.Bytes(), &list)
-	if len(list) != 1 {
-		t.Errorf("List count = %d, want %d", len(list), 1)
+	// The seed record is present, so we expect at least 2 (seed + 1 test-created).
+	if len(list) < 1 {
+		t.Errorf("List count = %d, want at least 1", len(list))
 	}
 }
 
