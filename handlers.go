@@ -1,9 +1,12 @@
 package main
 
 import (
+	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +28,22 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req UserCreate
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": "Invalid request body"})
+			var ve validator.ValidationErrors
+			if errors.As(err, &ve) {
+				details := make([]gin.H, 0, len(ve))
+				for _, fe := range ve {
+					details = append(details, gin.H{
+						"loc":  []string{"body", strings.ToLower(fe.Field())},
+						"msg":  "Field required",
+						"type": "missing",
+					})
+				}
+				c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": details})
+				return
+			}
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"detail": []gin.H{
+				{"loc": []string{"body"}, "msg": "Invalid request body", "type": "value_error"},
+			}})
 			return
 		}
 
