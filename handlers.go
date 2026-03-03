@@ -42,28 +42,37 @@ func (d *Deps) HealthHandler(w http.ResponseWriter, r *http.Request) {
 // Returns 400 if the username is already taken.
 // Equivalent to Python server.py register().
 func (d *Deps) RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	// Decode into both the typed struct and a raw map so we can echo the input
+	// in validation errors (matching Pydantic v2 behavior).
+	var raw map[string]any
 	var req UserCreateRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&raw); err != nil {
 		writeValidationError(w, []ValidationErrorItem{
-			{Loc: []string{"body"}, Msg: "Invalid request body", Type: "value_error"},
+			{Loc: []string{"body"}, Msg: "Invalid request body", Type: "value_error", Input: nil},
 		})
 		return
 	}
 
-	// Validate required fields (mirroring Pydantic's required-field validation).
+	// Marshal/unmarshal from raw map into the typed struct.
+	req.Username, _ = raw["username"].(string)
+	req.Password, _ = raw["password"].(string)
+
+	// Validate required fields (mirroring Pydantic v2's required-field validation).
 	var validationErrors []ValidationErrorItem
-	if req.Username == "" {
+	if _, ok := raw["username"]; !ok || req.Username == "" {
 		validationErrors = append(validationErrors, ValidationErrorItem{
-			Loc:  []string{"body", "username"},
-			Msg:  "Field required",
-			Type: "missing",
+			Loc:   []string{"body", "username"},
+			Msg:   "Field required",
+			Type:  "missing",
+			Input: raw,
 		})
 	}
-	if req.Password == "" {
+	if _, ok := raw["password"]; !ok || req.Password == "" {
 		validationErrors = append(validationErrors, ValidationErrorItem{
-			Loc:  []string{"body", "password"},
-			Msg:  "Field required",
-			Type: "missing",
+			Loc:   []string{"body", "password"},
+			Msg:   "Field required",
+			Type:  "missing",
+			Input: raw,
 		})
 	}
 	if len(validationErrors) > 0 {

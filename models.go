@@ -134,11 +134,12 @@ type ErrorResponse struct {
 	Detail string `json:"detail"`
 }
 
-// ValidationErrorItem represents a single validation error in the FastAPI format.
+// ValidationErrorItem represents a single validation error in the FastAPI/Pydantic v2 format.
 type ValidationErrorItem struct {
-	Loc  []string `json:"loc"`
-	Msg  string   `json:"msg"`
-	Type string   `json:"type"`
+	Loc   []string `json:"loc"`
+	Msg   string   `json:"msg"`
+	Type  string   `json:"type"`
+	Input any      `json:"input"`
 }
 
 // ValidationErrorResponse matches FastAPI's 422 validation error format
