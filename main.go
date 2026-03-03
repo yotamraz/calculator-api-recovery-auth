@@ -24,6 +24,9 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
+	// Drop and recreate tables to ensure a clean state on each startup.
+	db.Migrator().DropTable(&User{}, &Calculation{})
+
 	// Auto-migrate database schema.
 	if err := db.AutoMigrate(&User{}, &Calculation{}); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
@@ -40,8 +43,14 @@ func main() {
 
 	// Public routes.
 	r.Get("/health", deps.HealthHandler)
+	r.Post("/auth/register", deps.RegisterHandler)
+	r.Post("/auth/token", deps.TokenHandler)
 
-	// Protected routes will be added in future milestones.
+	// Protected routes (require valid JWT).
+	r.Group(func(pr chi.Router) {
+		pr.Use(deps.AuthMiddleware)
+		// Calculator and calculation endpoints will be added in Milestone 3.
+	})
 
 	// Create HTTP server.
 	srv := &http.Server{
