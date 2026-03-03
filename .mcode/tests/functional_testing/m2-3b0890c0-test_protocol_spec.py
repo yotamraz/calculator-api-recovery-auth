@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-03T19:32:40.317474+00:00
+Generated at: 2026-03-03T19:43:36.342021+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -133,8 +133,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "AUTH",
         "endpoint": "/auth/token",
         "method": "POST",
-        "content_type": "application/x-www-form-urlencoded",
-        "description": "Register a user then login with valid credentials via form-encoded body, expect 200 with access_token",
+        "description": "Register a user then login with valid credentials via OAuth2 password flow (form-encoded body), expect 200 with access_token",
         "setup": {
             "endpoint": "/auth/register",
             "method": "POST",
@@ -147,7 +146,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "data": {
+            "body": {
                 "username": "testuser_login",
                 "password": "${AUTH_PASSWORD}"
             }
@@ -160,8 +159,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/auth/token",
         "method": "POST",
-        "content_type": "application/x-www-form-urlencoded",
-        "description": "Attempt login with correct username but wrong password, expect 401",
+        "description": "Attempt login with correct username but wrong password via OAuth2 password flow, expect 401",
         "setup": {
             "endpoint": "/auth/register",
             "method": "POST",
@@ -174,7 +172,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
-            "data": {
+            "body": {
                 "username": "testuser_wrongpw",
                 "password": "definitely_wrong_password"
             }
@@ -187,12 +185,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "INVALID_INPUT",
         "endpoint": "/auth/token",
         "method": "POST",
-        "content_type": "application/x-www-form-urlencoded",
-        "description": "Attempt login with a username that does not exist, expect 401",
+        "description": "Attempt login with a username that does not exist via OAuth2 password flow, expect 401",
         "request_data": {
             "path": {},
             "query": {},
-            "data": {
+            "body": {
                 "username": "nonexistent_user_xyz",
                 "password": "${AUTH_PASSWORD}"
             }
