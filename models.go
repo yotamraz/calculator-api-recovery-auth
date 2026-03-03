@@ -133,3 +133,16 @@ type Token struct {
 type ErrorResponse struct {
 	Detail string `json:"detail"`
 }
+
+// ValidationErrorItem represents a single validation error in the FastAPI format.
+type ValidationErrorItem struct {
+	Loc  []string `json:"loc"`
+	Msg  string   `json:"msg"`
+	Type string   `json:"type"`
+}
+
+// ValidationErrorResponse matches FastAPI's 422 validation error format
+// where "detail" is an array of validation error items.
+type ValidationErrorResponse struct {
+	Detail []ValidationErrorItem `json:"detail"`
+}

@@ -18,6 +18,12 @@ func writeError(w http.ResponseWriter, status int, detail string) {
 	writeJSON(w, status, ErrorResponse{Detail: detail})
 }
 
+// writeValidationError writes a 422 JSON error response matching FastAPI/Pydantic's
+// validation error format where "detail" is an array of error items.
+func writeValidationError(w http.ResponseWriter, fields []ValidationErrorItem) {
+	writeJSON(w, http.StatusUnprocessableEntity, ValidationErrorResponse{Detail: fields})
+}
+
 // HealthHandler handles GET /health.
 func (d *Deps) HealthHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, HealthResponse{
@@ -38,13 +44,30 @@ func (d *Deps) HealthHandler(w http.ResponseWriter, r *http.Request) {
 func (d *Deps) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var req UserCreateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeError(w, http.StatusUnprocessableEntity, "Invalid request body")
+		writeValidationError(w, []ValidationErrorItem{
+			{Loc: []string{"body"}, Msg: "Invalid request body", Type: "value_error"},
+		})
 		return
 	}
 
 	// Validate required fields (mirroring Pydantic's required-field validation).
-	if req.Username == "" || req.Password == "" {
-		writeError(w, http.StatusUnprocessableEntity, "Invalid request body")
+	var validationErrors []ValidationErrorItem
+	if req.Username == "" {
+		validationErrors = append(validationErrors, ValidationErrorItem{
+			Loc:  []string{"body", "username"},
+			Msg:  "Field required",
+			Type: "missing",
+		})
+	}
+	if req.Password == "" {
+		validationErrors = append(validationErrors, ValidationErrorItem{
+			Loc:  []string{"body", "password"},
+			Msg:  "Field required",
+			Type: "missing",
+		})
+	}
+	if len(validationErrors) > 0 {
+		writeValidationError(w, validationErrors)
 		return
 	}
 
