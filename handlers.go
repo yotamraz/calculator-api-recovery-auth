@@ -59,6 +59,18 @@ func (d *Deps) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	req.Username, _ = raw["username"].(string)
 	req.Password, _ = raw["password"].(string)
 
+	// Build a sanitized copy of the input for validation errors, masking
+	// sensitive fields like "password" (matching Pydantic v2 / FastAPI behavior
+	// where SecretStr or test-framework sanitization masks passwords).
+	sanitizedInput := make(map[string]any, len(raw))
+	for k, v := range raw {
+		if k == "password" {
+			sanitizedInput[k] = "********"
+		} else {
+			sanitizedInput[k] = v
+		}
+	}
+
 	// Validate required fields (mirroring Pydantic v2's required-field validation).
 	var validationErrors []ValidationErrorItem
 	if _, ok := raw["username"]; !ok || req.Username == "" {
@@ -66,7 +78,7 @@ func (d *Deps) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			Loc:   []string{"body", "username"},
 			Msg:   "Field required",
 			Type:  "missing",
-			Input: raw,
+			Input: sanitizedInput,
 		})
 	}
 	if _, ok := raw["password"]; !ok || req.Password == "" {
@@ -74,7 +86,7 @@ func (d *Deps) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			Loc:   []string{"body", "password"},
 			Msg:   "Field required",
 			Type:  "missing",
-			Input: raw,
+			Input: sanitizedInput,
 		})
 	}
 	if len(validationErrors) > 0 {
