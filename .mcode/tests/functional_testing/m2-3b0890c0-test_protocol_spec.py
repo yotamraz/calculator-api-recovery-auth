@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-03T19:15:39.382504+00:00
+Generated at: 2026-03-03T19:17:46.948211+00:00
 Project: calculator-api-recovery-auth
 Milestone: 2
 """
@@ -149,7 +149,10 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "headers": {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            "body": "username=testuser_login&password=${AUTH_PASSWORD}"
+            "body": {
+                "username": "testuser_login",
+                "password": "${AUTH_PASSWORD}"
+            }
         },
         "expected_status": 200,
         "cleanup": null
@@ -175,7 +178,10 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "headers": {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            "body": "username=testuser_wrongpw&password=definitely_wrong_password"
+            "body": {
+                "username": "testuser_wrongpw",
+                "password": "definitely_wrong_password"
+            }
         },
         "expected_status": 401,
         "cleanup": null
@@ -192,7 +198,10 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "headers": {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            "body": "username=nonexistent_user_xyz&password=${AUTH_PASSWORD}"
+            "body": {
+                "username": "nonexistent_user_xyz",
+                "password": "${AUTH_PASSWORD}"
+            }
         },
         "expected_status": 401,
         "setup": null,
