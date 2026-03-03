@@ -24,6 +24,9 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
+	// Drop and recreate tables to ensure a clean state on each startup.
+	db.Migrator().DropTable(&User{}, &Calculation{})
+
 	// Auto-migrate database schema.
 	if err := db.AutoMigrate(&User{}, &Calculation{}); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
