@@ -10,7 +10,9 @@ import (
 func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(v) //nolint:errcheck
+	enc := json.NewEncoder(w)
+	enc.SetEscapeHTML(false)
+	enc.Encode(v) //nolint:errcheck
 }
 
 // writeError writes a JSON error response matching FastAPI's {"detail": "..."} format.
