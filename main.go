@@ -40,8 +40,14 @@ func main() {
 
 	// Public routes.
 	r.Get("/health", deps.HealthHandler)
+	r.Post("/auth/register", deps.RegisterHandler)
+	r.Post("/auth/token", deps.TokenHandler)
 
-	// Protected routes will be added in future milestones.
+	// Protected routes (require valid JWT).
+	r.Group(func(pr chi.Router) {
+		pr.Use(deps.AuthMiddleware)
+		// Calculator and calculation endpoints will be added in Milestone 3.
+	})
 
 	// Create HTTP server.
 	srv := &http.Server{
