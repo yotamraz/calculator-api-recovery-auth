@@ -42,6 +42,12 @@ func (d *Deps) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate required fields (mirroring Pydantic's required-field validation).
+	if req.Username == "" || req.Password == "" {
+		writeError(w, http.StatusUnprocessableEntity, "Invalid request body")
+		return
+	}
+
 	// Check for duplicate username.
 	var existing User
 	if err := d.DB.Where("username = ?", req.Username).First(&existing).Error; err == nil {
